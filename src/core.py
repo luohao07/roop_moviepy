@@ -10,9 +10,9 @@ from src.swapper import process_frame
 from tqdm import tqdm
 
 
-def handle_frame(frame, progress, process_args):
+def handle_frame(frame, index, processed_frames, progress, process_args):
     frame = process_frame(process_args, frame, progress)
-    return frame
+    processed_frames[index] = frame
 
 
 def process_video(process_args):
@@ -21,17 +21,12 @@ def process_video(process_args):
     processed_frames = []
 
     # 创建有序队列
-    processed_queue = queue.Queue()
+    frames = [frame for frame in clip.iter_frames()]
 
     # 创建线程池
     with concurrent.futures.ThreadPoolExecutor(max_workers=process_args.threads) as executor:
-        frame_infos = [(frame, progress, process_args) for frame in clip.iter_frames()]
-        # 使用多线程处理帧，并将处理后的帧放入队列
-        executor.map(processed_queue.put, executor.map(handle_frame, frame_infos))
-
-    # 从队列中按顺序取出处理后的帧
-    while not processed_queue.empty():
-        processed_frames.append(processed_queue.get())
+        for index, frame in enumerate(frames):
+            executor.submit(handle_frame, frame, index, processed_frames, progress, process_args)
 
     processed_clip = ImageSequenceClip(processed_frames, durations=[1/clip.fps] * len(processed_frames), fps=clip.fps)
     processed_clip.write_videofile(process_args.output_file, threads=process_args.threads)
