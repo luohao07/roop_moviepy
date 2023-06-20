@@ -31,10 +31,10 @@ def process_video(process_args):
 
     # 创建线程池
     with concurrent.futures.ThreadPoolExecutor(max_workers=process_args.threads) as executor:
-
         for index, frame in enumerate(frames):
             executor.submit(handle_frame, frame, index, processed_frames, progress, process_args)
 
+    print("finish")
     processed_clip = ImageSequenceClip(processed_frames, durations=[1/clip.fps] * len(processed_frames), fps=clip.fps)
     processed_clip.write_videofile(process_args.output_file, threads=process_args.threads)
     progress.close()
