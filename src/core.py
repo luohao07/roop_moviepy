@@ -10,16 +10,10 @@ from src.analyser import get_face_analyser
 from src.swapper import process_frame, read_all_faces
 from tqdm import tqdm
 
-import concurrent.futures
 
-import concurrent.futures
-import threading
-
-
-def handle_frame(frame, index, processed_frames, progress, process_args, lock):
-    processed_frame = process_frame(process_args, frame, progress)
-    with lock:
-        processed_frames[index] = processed_frame
+def handle_frame(frame, index, processed_frames, progress, process_args):
+    frame = process_frame(process_args, frame, progress)
+    processed_frames[index] = frame
 
 
 def process_video(process_args):
@@ -27,26 +21,15 @@ def process_video(process_args):
     clip = VideoFileClip(process_args.input_file)
     progress = tqdm(total=int(clip.fps * clip.duration))
     processed_frames = [None] * int(clip.fps * clip.duration)
-
     process_args.all_faces = read_all_faces(process_args.source_imgs)
 
-    # 创建线程池和锁
-    with concurrent.futures.ThreadPoolExecutor(max_workers=process_args.threads) as executor:
-        lock = threading.Lock()
+    # 创建有序队列
+    frames = [frame for frame in clip.iter_frames()]
 
+    # 创建线程池
+    with concurrent.futures.ThreadPoolExecutor(max_workers=process_args.threads) as executor:
         # 提交任务并获取Future对象
-        futures = [
-            executor.submit(
-                handle_frame,
-                frame,
-                index,
-                processed_frames,
-                progress,
-                process_args,
-                lock
-            )
-            for index, frame in enumerate(clip.iter_frames())
-        ]
+        futures = [executor.submit(handle_frame, frame, index, processed_frames, progress, process_args) for index, frame in enumerate(frames)]
 
         # 等待所有任务完成
         concurrent.futures.wait(futures)
