@@ -28,9 +28,12 @@ def process_video(process_args):
 
     # 创建线程池
     with concurrent.futures.ThreadPoolExecutor(max_workers=process_args.threads) as executor:
-        for index, frame in enumerate(frames):
-            executor.submit(handle_frame, frame, index, processed_frames, progress, process_args)
-        executor.shutdown()
+        # 提交任务并获取Future对象
+        futures = [executor.submit(handle_frame, frame, index, processed_frames, progress, process_args) for index, frame in enumerate(frames)]
+
+        # 等待所有任务完成
+        concurrent.futures.wait(futures)
+
     print("reface finished")
     print(processed_frames)
     processed_clip = ImageSequenceClip(processed_frames, durations=[1/clip.fps] * len(processed_frames), fps=clip.fps)
