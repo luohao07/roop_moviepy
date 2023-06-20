@@ -20,7 +20,7 @@ def process_video(process_args):
     for frame in clip.iter_frames():
         processed_frame = handle_frame(frame, progress, process_args)
         processed_frames.append(processed_frame)
-        if len(processed_frames) > 10:
+        if process_args.max_frames and len(processed_frames) >= process_args.max_frames:
             break
 
     processed_clip = ImageSequenceClip(processed_frames, durations=[1/clip.fps] * len(processed_frames), fps=clip.fps)

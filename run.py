@@ -7,5 +7,6 @@ if __name__ == '__main__':
     parser.add_argument('-i', '--input_file', type=str, help='Input video file')
     parser.add_argument('-o', '--output_file', type=str, help='Output video file')
     parser.add_argument('-f', '--source_imgs', nargs='+', type=str, help='Image file paths')
+    parser.add_argument('-n', '--max_frames', nargs='+', type=str, help='max frames to reface')
     args = parser.parse_args()
     main(args)
