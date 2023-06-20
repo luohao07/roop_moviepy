@@ -7,7 +7,7 @@ from moviepy.editor import VideoFileClip
 from moviepy.video.io.ImageSequenceClip import ImageSequenceClip
 
 from src.analyser import get_face_analyser
-from src.swapper import process_frame
+from src.swapper import process_frame, read_all_faces
 from tqdm import tqdm
 
 
@@ -21,6 +21,7 @@ def process_video(process_args):
     clip = VideoFileClip(process_args.input_file)
     progress = tqdm(total=int(clip.fps * clip.duration))
     processed_frames = []
+    process_args.all_faces = read_all_faces(process_args.source_imgs)
 
     # 创建有序队列
     frames = [frame for frame in clip.iter_frames()]
