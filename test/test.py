@@ -1,7 +1,7 @@
 import os
 import unittest
 from argparse import Namespace
-from src.run import main
+from src.core import main
 
 
 class TestMain(unittest.TestCase):
