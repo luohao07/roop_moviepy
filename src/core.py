@@ -35,7 +35,6 @@ def process_video(process_args):
         concurrent.futures.wait(futures)
 
     print("reface finished")
-    print(processed_frames)
     processed_clip = ImageSequenceClip(processed_frames, durations=[1/clip.fps] * len(processed_frames), fps=clip.fps)
     processed_clip.write_videofile(process_args.output_file, threads=process_args.threads)
     progress.close()
