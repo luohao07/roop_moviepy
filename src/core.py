@@ -26,7 +26,7 @@ def process_video(process_args):
     get_face_analyser()
     clip = VideoFileClip(process_args.input_file)
     progress = tqdm(total=int(clip.fps * clip.duration))
-    processed_frames = [None] * len(clip)
+    processed_frames = [None] * int(clip.fps * clip.duration)
 
     process_args.all_faces = read_all_faces(process_args.source_imgs)
 
