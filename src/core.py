@@ -6,6 +6,7 @@ import queue
 from moviepy.editor import VideoFileClip
 from moviepy.video.io.ImageSequenceClip import ImageSequenceClip
 
+from src.analyser import get_face_analyser
 from src.swapper import process_frame
 from tqdm import tqdm
 
@@ -16,6 +17,7 @@ def handle_frame(frame, index, processed_frames, progress, process_args):
 
 
 def process_video(process_args):
+    get_face_analyser()
     clip = VideoFileClip(process_args.input_file)
     progress = tqdm(total=int(clip.fps * clip.duration))
     processed_frames = []
