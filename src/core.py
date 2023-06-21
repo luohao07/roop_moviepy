@@ -58,6 +58,7 @@ def process_video(process_args):
 def create_video(processed_frames, fps, process_args):
     print("开始合成视频")
     data = range(len(processed_frames))
+    print(data)
     processed_clip = DataVideoClip(data=data, data_to_frame=partial(get_processed_frame, processed_frames), fps=fps)
     processed_clip.write_videofile(filename=process_args.output_file, threads=10)
 
