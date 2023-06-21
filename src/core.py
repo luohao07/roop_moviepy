@@ -9,19 +9,21 @@ from moviepy.video.VideoClip import DataVideoClip
 from src.analyser import get_face_analyser
 from src.swapper import process_frame, read_all_faces
 import time
+import src.globals as globals
 
 log_level = "INFO"
 
+
 # 处理帧
 def handle_frame(frames, index, processed_frames, process_args):
-    if log_level == "DEBUG":
+    if globals.log_level == "DEBUG":
         print(f"开始换脸帧{index}")
     # 没值说明没有读取成功
     while frames[index] is None:
         time.sleep(0.01)
     frame = process_frame(process_args, frames[index])
     processed_frames[index] = frame
-    if log_level == "DEBUG":
+    if globals.log_level == "DEBUG":
         print(f"完成换脸帧{index}")
 
 def handle_frames(frames, processed_frames, process_args):
@@ -61,21 +63,21 @@ def create_video(processed_frames, fps, process_args):
 
 
 def get_processed_frame(processed_frames, t):
-    if log_level == "DEBUG":
+    if globals.log_level == "DEBUG":
         print(f"获取帧{t}")
     while processed_frames[t] is None:
         time.sleep(0.01)
     processed_frame = processed_frames[t]
     if t != 0:
         processed_frames[t] = None
-    if log_level == "DEBUG":
+    if globals.log_level == "DEBUG":
         print(f"返回帧{t}")
     return processed_frame
 
 
 def main(process_args):
     assert os.path.exists(process_args.input_file)
-    log_level = process_args.log_level
+    globals.log_level = process_args.log_level
     for source_img in process_args.source_imgs:
         assert os.path.exists(source_img)
     if process_args.input_file and process_args.output_file:
