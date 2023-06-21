@@ -25,6 +25,7 @@ def handle_frame(frames, index, processed_frames, process_args):
         frame = process_frame(process_args, frames[index])
     except Exception as e:
         print(e)
+        frame = frames[index]
     processed_frames[index] = frame
     if globals.log_level == "DEBUG":
         print(f"完成换脸帧{index}")
@@ -71,8 +72,8 @@ def get_processed_frame(processed_frames, t):
     while processed_frames[t] is None:
         time.sleep(0.01)
     processed_frame = processed_frames[t]
-    if t >= 1000:
-        processed_frames[t-1000] = None
+    if t >= 3:
+        processed_frames[t-3] = None
     if globals.log_level == "DEBUG":
         print(f"返回帧{t}")
     return processed_frame

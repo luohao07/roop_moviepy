@@ -48,7 +48,7 @@ def process_faces(source_faces, target_frame):
     if not many_faces:
         return target_frame
     for index in range(len(source_faces)):
-        if len(many_faces) < index:
+        if index >= len(many_faces):
             break
         target_frame = swap_face_in_frame(source_faces[index], many_faces[index], target_frame)
     return target_frame
