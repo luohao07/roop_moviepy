@@ -1,11 +1,10 @@
-import asyncio
 import os
 import concurrent.futures
 import threading
 from functools import partial
 
 from moviepy.editor import VideoFileClip
-from moviepy.video.VideoClip import VideoClip, DataVideoClip
+from moviepy.video.VideoClip import DataVideoClip
 
 from src.analyser import get_face_analyser
 from src.swapper import process_frame, read_all_faces
