@@ -16,15 +16,11 @@ log_level = "INFO"
 
 # 处理帧
 def handle_frame(frames, index, processed_frames, process_args):
-    if globals.log_level == "DEBUG":
-        print(f"开始换脸帧{index}")
     # 没值说明没有读取成功
     while frames[index] is None:
         time.sleep(0.01)
     frame = process_frame(process_args, frames[index])
     processed_frames[index] = frame
-    if globals.log_level == "DEBUG":
-        print(f"完成换脸帧{index}")
 
 def handle_frames(frames, processed_frames, process_args):
     with concurrent.futures.ThreadPoolExecutor(process_args.threads) as executor:
@@ -56,11 +52,9 @@ def process_video(process_args):
 
 
 def create_video(processed_frames, fps, process_args):
-    print("开始合成视频")
     data = range(len(processed_frames))
-    print(data)
     processed_clip = DataVideoClip(data=data, data_to_frame=partial(get_processed_frame, processed_frames), fps=fps)
-    processed_clip.write_videofile(filename=process_args.output_file, threads=10)
+    processed_clip.write_videofile(filename=process_args.output_file, threads=process_args.threads)
 
 
 def get_processed_frame(processed_frames, t):
