@@ -1,43 +1,70 @@
-import argparse
+import asyncio
 import os
 import concurrent.futures
-import queue
+import threading
+from functools import partial
 
 from moviepy.editor import VideoFileClip
-from moviepy.video.io.ImageSequenceClip import ImageSequenceClip
+from moviepy.video.VideoClip import VideoClip, DataVideoClip
 
 from src.analyser import get_face_analyser
 from src.swapper import process_frame, read_all_faces
-from tqdm import tqdm
+import time
 
 
-def handle_frame(frame, index, processed_frames, progress, process_args):
-    frame = process_frame(process_args, frame, progress)
+# 处理帧
+def handle_frame(frames, index, processed_frames, process_args):
+    # 没值说明没有读取成功
+    while frames[index] is None:
+        time.sleep(0.01)
+    frame = process_frame(process_args, frames[index])
     processed_frames[index] = frame
+
+
+def handle_frames(frames, processed_frames, process_args):
+    with concurrent.futures.ThreadPoolExecutor(process_args.threads) as executor:
+        for index in range(len(frames)):
+            executor.submit(handle_frame, frames, index, processed_frames, process_args)
+
+
+# 加载帧
+def extract_frames(clip, frames):
+    index = 0
+    for frame in clip.iter_frames():
+        if index >= len(frames):
+            break
+        frames[index] = frame
+        index += 1
+        #print(f"加载帧{index}")
 
 
 def process_video(process_args):
     get_face_analyser()
     clip = VideoFileClip(process_args.input_file)
-    progress = tqdm(total=int(clip.fps * clip.duration))
-    processed_frames = [None] * int(clip.fps * clip.duration)
     process_args.all_faces = read_all_faces(process_args.source_imgs)
+    frames = [None] * int(clip.fps * clip.duration)
+    processed_frames = [None] * len(frames)
 
-    # 创建有序队列
-    frames = [frame for frame in clip.iter_frames()]
+    threading.Thread(target=extract_frames, args=(clip, frames)).start()
+    threading.Thread(target=handle_frames, args=(frames, processed_frames, process_args)).start()
 
-    # 创建线程池
-    with concurrent.futures.ThreadPoolExecutor(max_workers=process_args.threads) as executor:
-        # 提交任务并获取Future对象
-        futures = [executor.submit(handle_frame, frame, index, processed_frames, progress, process_args) for index, frame in enumerate(frames)]
+    create_video(processed_frames, clip.fps, process_args)
 
-        # 等待所有任务完成
-        concurrent.futures.wait(futures)
 
-    print("reface finished")
-    processed_clip = ImageSequenceClip(processed_frames, durations=[1/clip.fps] * len(processed_frames), fps=clip.fps)
-    processed_clip.write_videofile(process_args.output_file, threads=process_args.threads)
-    progress.close()
+def create_video(processed_frames, fps, process_args):
+    print("开始合成视频")
+    data = range(len(processed_frames))
+    processed_clip = DataVideoClip(data=data, data_to_frame=partial(get_processed_frame, processed_frames), fps=fps)
+    processed_clip.write_videofile(filename=process_args.output_file, threads=10)
+
+
+def get_processed_frame(processed_frames, t):
+    while processed_frames[t] is None:
+        time.sleep(0.01)
+    processed_frame = processed_frames[t]
+    if t != 0:
+        processed_frames[t] = None
+    return processed_frame
 
 
 def main(process_args):
@@ -48,4 +75,3 @@ def main(process_args):
         process_video(process_args)
     else:
         print('Please provide both input and output file paths.')
-
