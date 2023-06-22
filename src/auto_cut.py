@@ -67,8 +67,8 @@ def cut_video(args):
             index += 1
 
     cut_times = get_index_range(accept_infos, args.accept_min_time * 1.0 / args.gap_time)
-    if len(cut_times) >= 55:
-        cut_times = cut_times[:55]
+    if len(cut_times) >= 30:
+        cut_times = cut_times[:30]
     sub_clips = []
     sum_time = 0
     for cut_time in cut_times:
@@ -80,7 +80,7 @@ def cut_video(args):
         try:
             tmp_clip = VideoFileClip(args.input_file)
             sc = tmp_clip.subclip(s, e)
-            sc = sc.set_audio(tmp_clip.audio)
+            sc = sc.set_audio(tmp_clip.audio.subclip(s,e ))
             sub_clips.append(sc)
         except:
             continue
