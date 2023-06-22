@@ -1,4 +1,6 @@
 import concurrent.futures
+
+from moviepy.video.compositing.CompositeVideoClip import CompositeVideoClip
 from moviepy.video.io.VideoFileClip import VideoFileClip
 from src.analyser import get_face_many, get_face_analyser
 
@@ -51,7 +53,15 @@ def cut_video(args):
             index += 1
 
     cut_times = get_index_range(accept_infos, args.accept_min_time * 1.0 / args.gap_time)
-    print(cut_times)
+    sub_clips = []
+    for cut_time in cut_times:
+        s, e = cut_time
+        s = s * args.gap_time
+        e = e * args.gap_time
+        sub_clips.append(clip.subclip(s, e))
+
+    composite_clip = CompositeVideoClip(sub_clips)
+    composite_clip.write_videofile(args.output_file, threads=args.threads)
 
 
 
