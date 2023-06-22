@@ -43,11 +43,12 @@ def is_accept(frame, index, accept_infos, args):
 
 def cut_video(args):
     clip = VideoFileClip(args.input_file)
+    if args.gap_time < 1.0 / clip.fps:
+        args.gap_time = 1.0 / clip.fps
+        print(f"gap time 过低，重置为1/fps={args.gap_time}")
     accept_infos = [None] * int(clip.duration / args.gap_time)
     get_face_analyser()
 
-    if args.gap_time < 1.0 / clip.fps:
-        args.gap_time = 1.0 / clip.fps
     with concurrent.futures.ThreadPoolExecutor(max_workers=args.threads) as executor:
         index = 0
         t = 0
