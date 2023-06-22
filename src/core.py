@@ -24,6 +24,7 @@ def handle_frame(frames, index, processed_frames):
     except Exception as e:
         print(e)
         frame = frames[index]
+    frames[index] = None # 释放内存
     processed_frames[index] = frame
     if globals.args.log_level == "DEBUG":
         print(f"完成换脸帧{index}")
@@ -46,7 +47,7 @@ def extract_frames(clip, frames):
 
 
 def process_video():
-
+    start_time = time.clock()
     clip = VideoFileClip(globals.args.input_file)
     frames = [None] * int(clip.fps * clip.duration)
     processed_frames = [None] * len(frames)
@@ -58,6 +59,7 @@ def process_video():
     threading.Thread(target=handle_frames, args=(frames, processed_frames)).start()
 
     create_video(processed_frames, clip)
+    print(f"处理完成，耗时{time.clock() - start_time}")
 
 
 def create_video(processed_frames, clip):
