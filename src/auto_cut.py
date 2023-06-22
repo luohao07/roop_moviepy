@@ -22,6 +22,7 @@ def get_index_range(arr, accept_min_size):
     accept_range = []
     for _range in ranges:
         s, e = _range
+        print(f"{_range}，时长为{e-s+1}，需要时长为{accept_min_size}")
         if e - s + 1 >= accept_min_size:
             accept_range.append(_range)
 
