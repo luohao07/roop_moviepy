@@ -80,8 +80,8 @@ def get_processed_frame(processed_frames, t):
 
 def main(args):
     assert os.path.exists(args.input_file)
-    globals.args.log_level = args.log_level
     globals.args = args
+    globals.args.log_level = args.log_level
     for source_img in args.source_imgs:
         assert os.path.exists(source_img)
     if args.input_file and args.output_file:
