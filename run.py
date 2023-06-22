@@ -10,5 +10,6 @@ if __name__ == '__main__':
     parser.add_argument('-n', '--max_frames', nargs='+', type=str, help='max frames to reface')
     parser.add_argument('-tn', '--threads', type=int, help='threads', default=16)
     parser.add_argument('-l', '--log_level', type=str, help='log level', default="INFO")
+    parser.add_argument('-g', '--gender', type=str, help='gender: male or female', default=None)
     args = parser.parse_args()
     main(args)
