@@ -48,14 +48,14 @@ def cut_video(args):
     if args.gap_time < 1.0 / clip.fps:
         args.gap_time = 1.0 / clip.fps
         print(f"gap time 过低，重置为1/fps={args.gap_time}")
-    accept_infos = [None] * int(clip.duration / args.gap_time)
+    accept_infos = [False] * int(clip.duration / args.gap_time)
     get_face_analyser()
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=args.threads) as executor:
         index = 0
         t = 0
         progress = tqdm(total=len(accept_infos))
-        while t <= clip.duration and index < len(accept_infos):
+        while t <= clip.duration and index < len(accept_infos) and args.max_time * clip.fps >= index >= args.min_time * clip.fps:
             frame = clip.get_frame(t)
             executor.submit(is_accept, frame, index, accept_infos, progress, args)
             t += args.gap_time
