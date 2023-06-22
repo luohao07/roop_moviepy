@@ -67,8 +67,6 @@ def cut_video(args):
             index += 1
 
     cut_times = get_index_range(accept_infos, args.accept_min_time * 1.0 / args.gap_time)
-    if len(cut_times) >= 30:
-        cut_times = cut_times[:30]
     sub_clips = []
     tmp_clip = VideoFileClip(args.input_file)
     sum_time = 0
