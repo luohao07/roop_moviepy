@@ -61,6 +61,8 @@ def cut_video(args):
             if args.max_time * clip.fps >= index >= args.min_time * clip.fps:
                 frame = clip.get_frame(t)
                 executor.submit(is_accept, frame, index, accept_infos, progress, args)
+            if index >= args.max_time * clip.fps:
+                break
             t += args.gap_time
             index += 1
 
