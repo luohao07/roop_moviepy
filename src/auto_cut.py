@@ -1,6 +1,6 @@
 import concurrent.futures
 
-from moviepy.video.compositing.CompositeVideoClip import CompositeVideoClip
+from moviepy.video.compositing.concatenate import concatenate_videoclips
 from moviepy.video.io.VideoFileClip import VideoFileClip
 from src.analyser import get_face_many, get_face_analyser
 
@@ -61,8 +61,8 @@ def cut_video(args):
         print(f"实际使用的时间范围[{s}, {e}]")
         sub_clips.append(VideoFileClip(args.input_file).subclip(s, e))
 
-    composite_clip = CompositeVideoClip(sub_clips)
-    composite_clip.write_videofile(args.output_file, threads=args.threads)
+    final_clip = concatenate_videoclips(sub_clips)
+    final_clip.write_videofile(args.output_file, threads=args.threads)
 
 
 
