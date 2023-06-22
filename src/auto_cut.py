@@ -61,7 +61,7 @@ def cut_video(args):
             if args.max_time * clip.fps >= index >= args.min_time * clip.fps:
                 frame = clip.get_frame(t)
                 executor.submit(is_accept, frame, index, accept_infos, progress, args)
-                t += args.gap_time
+            t += args.gap_time
             index += 1
 
     cut_times = get_index_range(accept_infos, args.accept_min_time * 1.0 / args.gap_time)
@@ -78,7 +78,7 @@ def cut_video(args):
         try:
             tmp_clip = VideoFileClip(args.input_file)
             sc = tmp_clip.subclip(s, e)
-            sc.set_audio(tmp_clip.audio.subclip(s,e))
+            sc.set_audio(tmp_clip.audio.subclip(s, e))
             sub_clips.append(sc)
         except:
             pass
