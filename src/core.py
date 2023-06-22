@@ -57,12 +57,13 @@ def process_video(process_args):
     threading.Thread(target=extract_frames, args=(clip, frames)).start()
     threading.Thread(target=handle_frames, args=(frames, processed_frames, process_args)).start()
 
-    create_video(processed_frames, clip.fps, process_args)
+    create_video(processed_frames, clip, process_args)
 
 
-def create_video(processed_frames, fps, process_args):
+def create_video(processed_frames, clip, process_args):
     data = range(len(processed_frames))
-    processed_clip = DataVideoClip(data=data, data_to_frame=partial(get_processed_frame, processed_frames), fps=fps)
+    processed_clip = DataVideoClip(data=data, data_to_frame=partial(get_processed_frame, processed_frames), fps=clip.fps)
+    processed_clip.set_audio(clip.audio)
     processed_clip.write_videofile(filename=process_args.output_file, threads=process_args.threads)
 
 
