@@ -58,7 +58,7 @@ def cut_video(args):
         s, e = cut_time
         s = s * args.gap_time
         e = e * args.gap_time
-        sub_clips.append(clip.subclip(s, e))
+        sub_clips.append(VideoFileClip(args.input_file).subclip(s, e))
 
     composite_clip = CompositeVideoClip(sub_clips)
     composite_clip.write_videofile(args.output_file, threads=args.threads)
