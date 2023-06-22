@@ -55,10 +55,11 @@ def cut_video(args):
         index = 0
         t = 0
         progress = tqdm(total=len(accept_infos))
-        while t <= clip.duration and index < len(accept_infos) and args.max_time * clip.fps >= index >= args.min_time * clip.fps:
-            frame = clip.get_frame(t)
-            executor.submit(is_accept, frame, index, accept_infos, progress, args)
-            t += args.gap_time
+        while t <= clip.duration and index < len(accept_infos):
+            if args.max_time * clip.fps >= index >= args.min_time * clip.fps:
+                frame = clip.get_frame(t)
+                executor.submit(is_accept, frame, index, accept_infos, progress, args)
+                t += args.gap_time
             index += 1
 
     cut_times = get_index_range(accept_infos, args.accept_min_time * 1.0 / args.gap_time)
@@ -69,7 +70,7 @@ def cut_video(args):
         s = s * args.gap_time
         e = e * args.gap_time
         print(f"实际使用的时间范围[{s}, {e}]")
-        sum_time += e-s
+        sum_time += e - s
         sub_clips.append(VideoFileClip(args.input_file).subclip(s, e))
 
     print(f"原时间:{clip.duration}，剪辑后的时长:{sub_clips}")
