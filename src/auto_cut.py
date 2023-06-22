@@ -72,12 +72,13 @@ def cut_video(args):
     sub_clips = []
     tmp_clip = VideoFileClip(args.input_file)
     sum_time = 0
-    with open(f"${args.input_file}.txt", 'w') as file:
-        cut_info = {
-            "cut_times": cut_times,
-            "gap_time": args.gap_time
-        }
-        file.write(json.dumps(cut_info))
+    # with open(f"{args.input_file}.txt", 'w') as file:
+    #     cut_info = {
+    #         "cut_times": cut_times,
+    #         "gap_time": args.gap_time
+    #     }
+    #     file.write(json.dumps(cut_info))
+    print(cut_times)
     for cut_time in cut_times:
         s, e = cut_time
         s = s * args.gap_time
