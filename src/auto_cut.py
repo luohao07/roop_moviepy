@@ -24,7 +24,7 @@ def get_index_range(arr, accept_min_size):
     accept_range = []
     for _range in ranges:
         s, e = _range
-        print(f"{_range}，时长为{e-s+1}，需要时长为{accept_min_size}")
+        #print(f"{_range}，时长为{e-s+1}，需要时长为{accept_min_size}")
         if e - s + 1 >= accept_min_size:
             accept_range.append(_range)
 
@@ -58,6 +58,7 @@ def cut_video(args):
         s, e = cut_time
         s = s * args.gap_time
         e = e * args.gap_time
+        print(f"实际使用的时间范围[{s}, {e}]")
         sub_clips.append(VideoFileClip(args.input_file).subclip(s, e))
 
     composite_clip = CompositeVideoClip(sub_clips)
