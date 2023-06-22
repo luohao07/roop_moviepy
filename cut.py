@@ -13,6 +13,7 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--male_min', type=int, help='male_min', default=0)
     parser.add_argument('-d', '--male_max', type=int, help='male_max', default=10)
     parser.add_argument('-amt', '--accept_min_time', type=float, help='accept_min_time', default=2)
-    parser.add_argument('-mt', '--max_time', type=float, help='max_time', default=9999)
+    parser.add_argument('-maxt', '--max_time', type=float, help='max_time', default=9999)
+    parser.add_argument('-mint', '--min_time', type=float, help='min_time', default=0)
     args = parser.parse_args()
     cut_video(args)
