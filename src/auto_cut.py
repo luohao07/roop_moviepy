@@ -32,6 +32,6 @@ def cut_video(args):
     clip = VideoFileClip(args.input_file)
     accept_infos = [None] * int(clip.duration / args.gap_time)
     get_face_analyser()
-    threading.Thread(target=submit_is_accept, args=(clip, accept_infos, args))
+    threading.Thread(target=submit_is_accept, args=(clip, accept_infos, args)).start()
     time.sleep(100)
 
