@@ -65,6 +65,8 @@ def cut_video(args):
             index += 1
 
     cut_times = get_index_range(accept_infos, args.accept_min_time * 1.0 / args.gap_time)
+    if len(cut_times) >= 55:
+        cut_times = cut_times[:55]
     sub_clips = []
     sum_time = 0
     for cut_time in cut_times:
@@ -74,11 +76,13 @@ def cut_video(args):
         print(f"实际使用的时间范围[{s}, {e}]")
         sum_time += e - s
         try:
-            sc = VideoFileClip(args.input_file).subclip(s, e)
+            tmp_clip = VideoFileClip(args.input_file)
+            sc = tmp_clip.subclip(s, e)
+            sc.set_audio(tmp_clip.audio.subclip(s,e))
             sub_clips.append(sc)
         except:
             pass
 
-    print(f"原时间:{clip.duration}，剪辑后的时长:{sub_clips}")
+    print(f"原时间:{clip.duration}，剪辑后的时长:{sum_time}")
     final_clip = concatenate_videoclips(sub_clips)
     final_clip.write_videofile(args.output_file, threads=args.threads)
