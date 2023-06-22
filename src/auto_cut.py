@@ -1,9 +1,5 @@
 import concurrent.futures
-import threading
-import time
-
 from moviepy.video.io.VideoFileClip import VideoFileClip
-
 from src.analyser import get_face_many, get_face_analyser
 
 
@@ -57,6 +53,4 @@ def cut_video(args):
     print(cut_times)
 
 
-    #threading.Thread(target=submit_is_accept, args=(clip, accept_infos, args)).start()
-    #time.sleep(100)
 
