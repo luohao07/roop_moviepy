@@ -70,6 +70,7 @@ def cut_video(args):
     if len(cut_times) >= 30:
         cut_times = cut_times[:30]
     sub_clips = []
+    tmp_clip = VideoFileClip(args.input_file)
     sum_time = 0
     for cut_time in cut_times:
         s, e = cut_time
@@ -78,9 +79,8 @@ def cut_video(args):
         print(f"实际使用的时间范围[{s}, {e}]")
         sum_time += e - s
         try:
-            tmp_clip = VideoFileClip(args.input_file)
             sc = tmp_clip.subclip(s, e)
-            sc = sc.set_audio(tmp_clip.audio.subclip(s,e ))
+            sc = sc.set_audio(tmp_clip.audio.subclip(s,e))
             sub_clips.append(sc)
         except:
             continue
