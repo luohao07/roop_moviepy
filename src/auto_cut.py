@@ -2,6 +2,7 @@ import concurrent.futures
 
 from moviepy.video.compositing.concatenate import concatenate_videoclips
 from moviepy.video.io.VideoFileClip import VideoFileClip
+from tqdm import tqdm
 
 from src.analyser import get_face_many, get_face_analyser
 
@@ -32,13 +33,14 @@ def get_index_range(arr, accept_min_size):
     return accept_range
 
 
-def is_accept(frame, index, accept_infos, args):
+def is_accept(frame, index, accept_infos, progress, args):
     many_faces = get_face_many(frame)
     male_faces = [face for face in many_faces if face['gender'] == 1]
     female_faces = [face for face in many_faces if face['gender'] == 0]
     accept = args.female_min <= len(female_faces) <= args.female_max and args.male_min <= len(
         male_faces) <= args.male_max
     accept_infos[index] = accept
+    progress.update(1)
 
 
 def cut_video(args):
@@ -52,9 +54,10 @@ def cut_video(args):
     with concurrent.futures.ThreadPoolExecutor(max_workers=args.threads) as executor:
         index = 0
         t = 0
+        progress = tqdm(total=len(accept_infos))
         while t <= clip.duration and index < len(accept_infos):
             frame = clip.get_frame(t)
-            executor.submit(is_accept, frame, index, accept_infos, args)
+            executor.submit(is_accept, frame, index, accept_infos, progress, args)
             t += args.gap_time
             index += 1
 
