@@ -73,7 +73,11 @@ def cut_video(args):
         e = e * args.gap_time
         print(f"实际使用的时间范围[{s}, {e}]")
         sum_time += e - s
-        sub_clips.append(VideoFileClip(args.input_file).subclip(s, e))
+        try:
+            sc = VideoFileClip(args.input_file).subclip(s, e)
+            sub_clips.append(sc)
+        except:
+            pass
 
     print(f"原时间:{clip.duration}，剪辑后的时长:{sub_clips}")
     final_clip = concatenate_videoclips(sub_clips)
