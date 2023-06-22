@@ -55,7 +55,7 @@ def cut_video(args):
         index = 0
         t = 0
         min_time = max(0, args.min_time)
-        max_time = max(clip.duration, args.max_time)
+        max_time = min(clip.duration, args.max_time)
         progress = tqdm(total=int((max_time - min_time) / args.gap_time))
         while t <= clip.duration and index < len(accept_infos):
             if args.max_time * clip.fps >= index >= args.min_time * clip.fps:
