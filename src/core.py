@@ -47,7 +47,7 @@ def extract_frames(clip, frames):
 
 
 def process_video():
-    start_time = time.clock()
+    start_time = time.perf_counter()
     clip = VideoFileClip(globals.args.input_file)
     frames = [None] * int(clip.fps * clip.duration)
     processed_frames = [None] * len(frames)
@@ -59,7 +59,7 @@ def process_video():
     threading.Thread(target=handle_frames, args=(frames, processed_frames)).start()
 
     create_video(processed_frames, clip)
-    print(f"处理完成，耗时{time.clock() - start_time}")
+    print(f"处理完成，耗时{time.perf_counter() - start_time}")
 
 
 def create_video(processed_frames, clip):
