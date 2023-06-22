@@ -4,7 +4,7 @@ import time
 
 from moviepy.video.io.VideoFileClip import VideoFileClip
 
-from src.analyser import get_face_many
+from src.analyser import get_face_many, get_face_analyser
 
 
 def is_accept(frame, index, accept_infos, args):
@@ -21,6 +21,7 @@ def submit_is_accept(clip, accept_infos, args):
         index = 0
         t = 0
         while t <= clip.duration and index < len(accept_infos):
+            print(f"提交任务{index}")
             frame = clip.get_frame(t)
             executor.submit(is_accept, frame, index, accept_infos, args)
             t += args.gap_time
@@ -30,6 +31,7 @@ def submit_is_accept(clip, accept_infos, args):
 def cut_video(args):
     clip = VideoFileClip(args.input_file)
     accept_infos = [None] * int(clip.duration / args.gap_time)
+    get_face_analyser()
     threading.Thread(target=submit_is_accept, args=(clip, accept_infos, args))
     time.sleep(100)
 
