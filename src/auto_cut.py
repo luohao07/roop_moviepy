@@ -80,10 +80,10 @@ def cut_video(args):
         try:
             tmp_clip = VideoFileClip(args.input_file)
             sc = tmp_clip.subclip(s, e)
-            sc.set_audio(tmp_clip.audio.subclip(s, e))
+            sc = sc.set_audio(tmp_clip.audio)
             sub_clips.append(sc)
         except:
-            pass
+            continue
 
     print(f"原时间:{clip.duration}，剪辑后的时长:{sum_time}")
     final_clip = concatenate_videoclips(sub_clips)
