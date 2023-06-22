@@ -18,7 +18,7 @@ def handle_frame(frames, index, processed_frames):
         print(f"开始换脸帧{index}")
     # 没值说明没有读取成功
     while frames[index] is None:
-        time.sleep(0.01)
+        time.sleep(globals.args.sleep_time)
     try:
         frame = process_frame(frames[index])
     except Exception as e:
@@ -46,11 +46,13 @@ def extract_frames(clip, frames):
 
 
 def process_video():
-    get_face_analyser()
+
     clip = VideoFileClip(globals.args.input_file)
-    globals.args.all_faces = read_all_faces(globals.args.source_imgs)
     frames = [None] * int(clip.fps * clip.duration)
     processed_frames = [None] * len(frames)
+
+    get_face_analyser()
+    globals.args.all_faces = read_all_faces(globals.args.source_imgs)
 
     threading.Thread(target=extract_frames, args=(clip, frames)).start()
     threading.Thread(target=handle_frames, args=(frames, processed_frames)).start()
@@ -69,7 +71,7 @@ def get_processed_frame(processed_frames, t):
     if globals.args.log_level == "DEBUG":
         print(f"获取帧{t}")
     while processed_frames[t] is None:
-        time.sleep(0.01)
+        time.sleep(globals.args.sleep_time)
     processed_frame = processed_frames[t]
     if t >= 3:
         processed_frames[t-3] = None

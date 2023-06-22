@@ -11,5 +11,6 @@ if __name__ == '__main__':
     parser.add_argument('-tn', '--threads', type=int, help='threads', default=16)
     parser.add_argument('-l', '--log_level', type=str, help='log level', default="INFO")
     parser.add_argument('-g', '--gender', type=str, help='gender: male or female', default=None)
+    parser.add_argument('-st', '--sleep_time', type=float, help='sleep time on wait', default=0.002)
     args = parser.parse_args()
     main(args)
