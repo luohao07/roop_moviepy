@@ -19,7 +19,7 @@ def read_all_faces(sources_imgs):
 
 
 def process_frame(frame, progress=None):
-    frame = process_faces(globals.args.args.all_faces, frame)
+    frame = process_faces(globals.args.all_faces, frame)
     if progress:
         progress.update(1)
     return frame
