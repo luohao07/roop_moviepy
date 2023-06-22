@@ -5,6 +5,7 @@ from functools import partial
 
 from moviepy.editor import VideoFileClip
 from moviepy.video.VideoClip import DataVideoClip
+from moviepy.video.compositing.CompositeVideoClip import CompositeVideoClip
 
 from src.analyser import get_face_analyser
 from src.swapper import process_frame, read_all_faces
@@ -63,8 +64,9 @@ def process_video(process_args):
 def create_video(processed_frames, clip, process_args):
     data = range(len(processed_frames))
     processed_clip = DataVideoClip(data=data, data_to_frame=partial(get_processed_frame, processed_frames), fps=clip.fps)
-    processed_clip.set_audio(clip.audio)
-    processed_clip.write_videofile(filename=process_args.output_file, threads=process_args.threads)
+    audio_clip = clip.audio
+    composite_clip = CompositeVideoClip([processed_clip, audio_clip])
+    composite_clip.write_videofile(filename=process_args.output_file, threads=process_args.threads)
 
 
 def get_processed_frame(processed_frames, t):
