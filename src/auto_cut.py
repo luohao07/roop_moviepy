@@ -1,6 +1,5 @@
 import concurrent.futures
 import json
-import os
 
 from moviepy.video.compositing.concatenate import concatenate_videoclips
 from moviepy.video.io.VideoFileClip import VideoFileClip
@@ -14,6 +13,8 @@ def get_index_range(arr, accept_min_size):
     start = None
 
     for i, value in enumerate(arr):
+        if value is None:
+            continue
         if value:
             if start is None:
                 start = i
@@ -60,6 +61,19 @@ def cut_video_wrap(args):
     clip.write_videofile(args.output_file, threads=args.threads)
 
 
+def set_false_between(array, min_size):
+    false_indices = [i for i, val in enumerate(array) if val is False]
+
+    for i in range(len(false_indices) - 1):
+        if false_indices[i + 1] - false_indices[i] <= min_size:
+            start_index = false_indices[i]
+            end_index = false_indices[i + 1]
+            for j in range(start_index + 1, end_index):
+                array[j] = False
+
+    return array
+
+
 def cut_video(clip, accept_infos, args):
     if args.gap_time < 1.0 / clip.fps:
         args.gap_time = 1.0 / clip.fps
@@ -79,9 +93,11 @@ def cut_video(clip, accept_infos, args):
             if t >= args.max_time:
                 break
             t += args.gap_time
-            index += 1
+            index = t * clip.fps
 
-    cut_times = get_index_range(accept_infos, args.accept_min_time * 1.0 / args.gap_time)
+    cut_times = get_index_range(accept_infos, args.accept_min_time * clip.fps)
+    # 如果任何时间差小于accept_min_time的帧都为False，那中间的部分就不用检测了，直接设置为False
+    set_false_between(accept_infos, args.accept_min_time * clip.fps + 1)
     for cut_time in cut_times:
         for i in range(len(cut_time)):
             cut_time[i] *= args.gap_time
