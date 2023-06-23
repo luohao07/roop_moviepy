@@ -13,7 +13,7 @@ if __name__ == '__main__':
     parser.add_argument('-f', '--log_file', nargs='+', type=str, help='log_file')
     args = parser.parse_args()
 
-    with open("./asserts/star424.txt","r") as file:
+    with open(args.log_file,"r") as file:
         clip = VideoFileClip(args.input_file)
         log = json.load(file)
         do_cut_to_clip(clip, args, log['cut_times'], False)
