@@ -110,15 +110,15 @@ def cut_video(clip, accept_infos, args):
     set_false_between(accept_infos, args.accept_min_time * clip.fps)
 
 
-def do_cut_to_clip(clip, args, cut_times):
+def do_cut_to_clip(clip, args, cut_times, save_log = True):
     sub_clips = []
     sum_time = 0
-    with open(f"{args.input_file}.txt", 'w') as file:
-        cut_info = {
-            "cut_times": cut_times,
-            "gap_time": args.gap_time
-        }
-        file.write(json.dumps(cut_info))
+    if save_log:
+        with open(f"{args.input_file}.txt", 'w') as file:
+            cut_info = {
+                "cut_times": cut_times
+            }
+            file.write(json.dumps(cut_info))
     print(cut_times)
     for cut_time in cut_times:
         s, e = cut_time
