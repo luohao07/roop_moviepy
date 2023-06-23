@@ -55,7 +55,7 @@ def cut_video_wrap(args):
         print(f"开始剪辑gap_time={gap_time}")
         args.gap_time = gap_time
         cut_video(clip, accept_infos, args)
-        if gap_time >= 1.0 / clip.fps + 0.001:
+        if gap_time <= 1.0 / clip.fps + 0.001:
             break
         gap_time = gap_time / 4.0
 
@@ -103,7 +103,7 @@ def cut_video(clip, accept_infos, args):
             index = int(t * clip.fps)
         print(f"任务提交结束：{t}, {index}, {len(accept_infos)}")
 
-    # 如果任何时间差小于accept_min_time的帧都为False，那中间的部分就不用检测了，直接设置为False
+    # 如果任意两个时间差小于accept_min_time的帧都为False，那中间的部分就不用检测了，直接设置为False
     set_false_between(accept_infos, args.accept_min_time * clip.fps)
 
 
