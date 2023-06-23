@@ -79,7 +79,7 @@ def cut_video(clip, args):
     cut_times = get_index_range(accept_infos, args.accept_min_time * 1.0 / args.gap_time)
     for cut_time in cut_times:
         for i in range(len(cut_time)):
-            cut_time[i] *= 0.1
+            cut_time[i] *= args.gap_time
     return do_cut_to_clip(clip, args, cut_times)
 
 
