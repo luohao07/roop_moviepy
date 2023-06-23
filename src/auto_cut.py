@@ -48,7 +48,7 @@ def is_accept(frame, index, accept_infos, progress, args):
 
 def cut_video_wrap(args):
     clip = VideoFileClip(args.input_file)
-    accept_infos = [False] * int(clip.duration / args.gap_time)
+    accept_infos = [False] * int(clip.duration * clip.fps)
 
     last_gap_time = 4
     while args.gap_time >= 1.0 / clip.fps + 0.001:  # 加0.001是为了防止精度误差
@@ -87,6 +87,8 @@ def cut_video(clip, accept_infos, args):
         max_time = min(clip.duration, args.max_time)
         progress = tqdm(total=int((max_time - min_time) / args.gap_time))
         while t <= clip.duration and index < len(accept_infos):
+            if not (accept_infos[index] is None):
+                continue
             #print(f"提交任务{index}")
             if args.max_time >= t >= args.min_time:
                 frame = clip.get_frame(t)
