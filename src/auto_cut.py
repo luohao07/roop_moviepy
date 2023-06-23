@@ -45,8 +45,16 @@ def is_accept(frame, index, accept_infos, progress, args):
     progress.update(1)
 
 
-def cut_video(args):
+def cut_video_wrap(args):
     clip = VideoFileClip(args.input_file)
+    args.gap_time = 1
+    clip = cut_video(clip, args)
+    args.gap_time = 0
+    clip = cut_video(clip, args)
+    clip.write_videofile(args.output_file, threads=args.threads)
+
+
+def cut_video(clip, args):
     if args.gap_time < 1.0 / clip.fps:
         args.gap_time = 1.0 / clip.fps
         print(f"gap time 过低，重置为1/fps={args.gap_time}")
@@ -72,13 +80,11 @@ def cut_video(args):
     for cut_time in cut_times:
         for i in range(len(cut_time)):
             cut_time[i] *= 0.1
-    clip.close()
-    do_cut(args, cut_times)
+    return do_cut_to_clip(clip, args, cut_times)
 
 
-def do_cut(args, cut_times):
+def do_cut_to_clip(clip, args, cut_times):
     sub_clips = []
-    tmp_clip = VideoFileClip(args.input_file)
     sum_time = 0
     with open(f"{args.input_file}.txt", 'w') as file:
         cut_info = {
@@ -92,13 +98,12 @@ def do_cut(args, cut_times):
         print(f"实际使用的时间范围[{s}, {e}]")
         sum_time += e - s
         try:
-            sc = tmp_clip.subclip(s, e)
-            sc = sc.set_audio(tmp_clip.audio.subclip(s,e))
+            sc = clip.subclip(s, e)
+            sc = sc.set_audio(clip.audio.subclip(s,e))
             sub_clips.append(sc)
         except:
             print(f"提取片段时出现异常，片段:[{s}, {e}],")
             continue
 
-    print(f"原时间:{tmp_clip.duration}，剪辑后的时长:{sum_time}")
-    final_clip = concatenate_videoclips(sub_clips)
-    final_clip.write_videofile(args.output_file, threads=args.threads)
+    print(f"原时间:{clip.duration}，剪辑后的时长:{sum_time}")
+    return concatenate_videoclips(sub_clips)
