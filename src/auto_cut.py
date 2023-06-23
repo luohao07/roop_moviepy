@@ -50,13 +50,17 @@ def copy_and_read_video(args, clips):
     with open(args.input_file, 'rb') as file:
         data = file.read()
         print(f"拷贝数据，读取成功，长度：{len(data)}")
-    for i in range(args.copies):
-        with open(f"cache/{args.input_file}_bak.{i}", 'wb') as copy_file:
-            copy_file.write(data)
-            copy_file.flush()
-            clips[i + 1] = VideoFileClip(f"cache/{args.input_file}_bak.{i}")
-            print(f"拷贝数据，写入成功：{args.input_file}_bak.{i}")
+    chunk_size = 4096
+    num_chunks = len(data) // chunk_size
 
+    for i in range(num_chunks):
+        chunk_data = data[i * chunk_size: (i + 1) * chunk_size]
+        new_file_name = f'cache/{args.input_file}_{i}'
+        with open(new_file_name, 'wb') as new_file:
+            new_file.write(chunk_data)
+            new_file.flush()
+            clips[i+1] = VideoFileClip(new_file_name)
+            print(f"复制并加载第{i+1}个文件成功")
 
 def cut_video(args):
     clips = [None] * (args.copies + 1)
