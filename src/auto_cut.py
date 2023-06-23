@@ -50,7 +50,7 @@ def cut_video_wrap(args):
     clip = VideoFileClip(args.input_file)
     accept_infos = [None] * int(clip.duration * clip.fps)
 
-    gap_time = args.accept_min_time
+    gap_time = args.accept_min_time / 4.0
     while gap_time >= 1.0 / clip.fps + 0.001:
         print(f"开始剪辑gap_time={gap_time}")
         args.gap_time = gap_time
