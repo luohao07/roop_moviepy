@@ -49,7 +49,7 @@ def cut_video_wrap(args):
     clip = VideoFileClip(args.input_file)
 
     last_gap_time = 4
-    while args.gap_time <= 1.0 / clip.fps + 0.001:  # 加0.001是为了防止精度误差
+    while args.gap_time >= 1.0 / clip.fps + 0.001:  # 加0.001是为了防止精度误差
         args.gap_time = clip.duration / 2000
         args.gap_time = min(1, args.gap_time)  # 至少都要每秒检测一帧
         args.gap_time = max(last_gap_time / 4.0, args.gap_time)  # 每次的精度至少是上一次的4倍
