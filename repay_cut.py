@@ -10,10 +10,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Video processing using MoviePy')
     parser.add_argument('-i', '--input_file', type=str, help='Input video file')
     parser.add_argument('-o', '--output_file', type=str, help='Output video file')
-    parser.add_argument('-f', '--log_file', nargs='+', type=str, help='log_file')
+    parser.add_argument('-f', '--log_file', type=str, help='log_file')
     args = parser.parse_args()
 
-    with open(args.log_file,"r") as file:
+    with open(args.log_file, "r") as file:
         clip = VideoFileClip(args.input_file)
         log = json.load(file)
         do_cut_to_clip(clip, args, log['cut_times'], False)
