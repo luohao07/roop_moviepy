@@ -47,10 +47,16 @@ def is_accept(frame, index, accept_infos, progress, args):
 
 def cut_video_wrap(args):
     clip = VideoFileClip(args.input_file)
-    args.gap_time = 1
-    clip = cut_video(clip, args)
-    args.gap_time = 0
-    clip = cut_video(clip, args)
+
+    last_gap_time = 4
+    while args.gap_time <= 1.0 / clip.fps + 0.001:  # 加0.001是为了防止精度误差
+        args.gap_time = clip.duration / 2000
+        args.gap_time = min(1, args.gap_time)  # 至少都要每秒检测一帧
+        args.gap_time = max(last_gap_time / 4.0, args.gap_time)  # 每次的精度至少是上一次的4倍
+        print(f"开始检测，当前视频时长{clip.duration}，检测gap_time={args.gap_time}")
+        clip = cut_video(clip, args)
+        last_gap_time = args.gap_time
+
     clip.write_videofile(args.output_file, threads=args.threads)
 
 
@@ -99,7 +105,7 @@ def do_cut_to_clip(clip, args, cut_times):
         sum_time += e - s
         try:
             sc = clip.subclip(s, e)
-            sc = sc.set_audio(clip.audio.subclip(s,e))
+            sc = sc.set_audio(clip.audio.subclip(s, e))
             sub_clips.append(sc)
         except:
             print(f"提取片段时出现异常，片段:[{s}, {e}],")
