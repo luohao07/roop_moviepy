@@ -78,7 +78,7 @@ def cut_video(args):
         clip_index = 0
         while t <= clips[0].duration and index < len(accept_infos):
             if args.max_time >= t >= args.min_time:
-                if (not clips[clip_index]) or clip_index >= len(clips):
+                if clip_index >= len(clips) or (not clips[clip_index]):
                     clip_index = 0
                 print(f"提交第{index}帧处理任务，clip_index={clip_index}")
                 executor.submit(is_accept, clips[clip_index], t, index, accept_infos, progress, args)
