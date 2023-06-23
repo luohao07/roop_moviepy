@@ -50,9 +50,11 @@ def cut_video_wrap(args):
     clip = VideoFileClip(args.input_file)
     accept_infos = [None] * int(clip.duration * clip.fps)
 
-    # 先用accept_min_time检测一轮
-    args.gap_time = args.accept_min_time
-    cut_video(clip, accept_infos, args)
+    gap_time = args.accept_min_time
+    while gap_time >= 0.1:
+        args.gap_time = gap_time
+        cut_video(clip, accept_infos, args)
+        gap_time = gap_time / 8.0
 
     # 然后再精剪剩下的内容
     args.gap_time = 0
@@ -91,18 +93,13 @@ def cut_video(clip, accept_infos, args):
     with concurrent.futures.ThreadPoolExecutor(max_workers=args.threads) as executor:
         index = 0
         t = 0
-        min_time = max(0, args.min_time)
-        max_time = min(clip.duration, args.max_time)
-        progress = tqdm(total=int((max_time - min_time) / args.gap_time))
+        progress = tqdm(total=clip.duration / args.gap)
         while t <= clip.duration and index < len(accept_infos):
-            if not (accept_infos[index] is None):
-                continue
-            # print(f"提交任务{index}")
-            if args.max_time >= t >= args.min_time:
+            if accept_infos[index] is None:
                 frame = clip.get_frame(t)
                 executor.submit(is_accept, frame, index, accept_infos, progress, args)
-            if t >= args.max_time:
-                break
+            else:
+                progress.update(1)
             t += args.gap_time
             index = int(t * clip.fps)
         print(f"任务提交结束：{t}, {index}, {len(accept_infos)}")
