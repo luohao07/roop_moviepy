@@ -76,7 +76,6 @@ def set_false_between(array, min_size):
         if false_indices[i + 1] - false_indices[i] - 1 <= min_size:
             start_index = false_indices[i]
             end_index = false_indices[i + 1]
-            print(f"[{start_index}, {end_index}]之间的内容全部置为False")
             for j in range(start_index + 1, end_index):
                 array[j] = False
 
@@ -95,8 +94,12 @@ def cut_video(clip, accept_infos, args):
         progress = tqdm(total=clip.duration / args.gap_time)
         while t <= clip.duration and index < len(accept_infos):
             if accept_infos[index] is None:
-                frame = clip.get_frame(t)
-                executor.submit(is_accept, frame, index, accept_infos, progress, args)
+                try:
+                    frame = clip.get_frame(t)
+                    executor.submit(is_accept, frame, index, accept_infos, progress, args)
+                except:
+                    print(f"第{index}帧读取失败")
+                    accept_infos[index] = False
             else:
                 progress.update(1)
             t += args.gap_time
