@@ -51,11 +51,13 @@ def cut_video_wrap(args):
     accept_infos = [None] * int(clip.duration * clip.fps)
 
     gap_time = args.accept_min_time / 4.0
-    while gap_time >= 1.0 / clip.fps + 0.001:
+    while True:
         print(f"开始剪辑gap_time={gap_time}")
         args.gap_time = gap_time
         cut_video(clip, accept_infos, args)
-        gap_time = gap_time / 8.0
+        if gap_time >= 1.0 / clip.fps + 0.001:
+            break
+        gap_time = gap_time / 4.0
 
     cut_frames = get_index_range(accept_infos, args.accept_min_time * clip.fps)
     for arr in cut_frames:
