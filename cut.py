@@ -1,6 +1,6 @@
 import argparse
 
-from src.auto_cut import cut_video
+from src.auto_cut import cut_video_wrap
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Video processing using MoviePy')
@@ -16,4 +16,4 @@ if __name__ == '__main__':
     parser.add_argument('-maxt', '--max_time', type=float, help='max_time', default=9999)
     parser.add_argument('-mint', '--min_time', type=float, help='min_time', default=0)
     args = parser.parse_args()
-    cut_video(args)
+    cut_video_wrap(args)
