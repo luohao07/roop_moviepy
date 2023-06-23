@@ -95,6 +95,7 @@ def cut_video(clip, accept_infos, args):
                 break
             t += args.gap_time
             index = int(t * clip.fps)
+        print(f"任务提交结束：{t}, {index}, {len(accept_infos)}")
 
     cut_times = get_index_range(accept_infos, args.accept_min_time * clip.fps)
     # 如果任何时间差小于accept_min_time的帧都为False，那中间的部分就不用检测了，直接设置为False
