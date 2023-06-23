@@ -51,14 +51,11 @@ def cut_video_wrap(args):
     accept_infos = [None] * int(clip.duration * clip.fps)
 
     gap_time = args.accept_min_time
-    while gap_time >= 0.1:
+    while gap_time >= 1.0 / clip.fps + 0.001:
+        print(f"开始剪辑gap_time={gap_time}")
         args.gap_time = gap_time
         cut_video(clip, accept_infos, args)
         gap_time = gap_time / 8.0
-
-    # 然后再精剪剩下的内容
-    args.gap_time = 0
-    cut_video(clip, accept_infos, args)
 
     cut_frames = get_index_range(accept_infos, args.accept_min_time * clip.fps)
     for arr in cut_frames:
@@ -93,7 +90,7 @@ def cut_video(clip, accept_infos, args):
     with concurrent.futures.ThreadPoolExecutor(max_workers=args.threads) as executor:
         index = 0
         t = 0
-        progress = tqdm(total=clip.duration / args.gap)
+        progress = tqdm(total=clip.duration / args.gap_time)
         while t <= clip.duration and index < len(accept_infos):
             if accept_infos[index] is None:
                 frame = clip.get_frame(t)
