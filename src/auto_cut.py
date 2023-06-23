@@ -48,7 +48,7 @@ def is_accept(frame, index, accept_infos, progress, args):
 
 def cut_video_wrap(args):
     clip = VideoFileClip(args.input_file)
-    accept_infos = [False] * int(clip.duration * clip.fps)
+    accept_infos = [None] * int(clip.duration * clip.fps)
 
     last_gap_time = 4
     while args.gap_time >= 1.0 / clip.fps + 0.001:  # 加0.001是为了防止精度误差
