@@ -69,6 +69,14 @@ def cut_video(args):
             index += 1
 
     cut_times = get_index_range(accept_infos, args.accept_min_time * 1.0 / args.gap_time)
+    for cut_time in cut_times:
+        for i in range(len(cut_time)):
+            cut_time[i] *= 0.1
+    clip.close()
+    do_cut(args, cut_times)
+
+
+def do_cut(args, cut_times):
     sub_clips = []
     tmp_clip = VideoFileClip(args.input_file)
     sum_time = 0
@@ -81,8 +89,6 @@ def cut_video(args):
     print(cut_times)
     for cut_time in cut_times:
         s, e = cut_time
-        s = s * args.gap_time
-        e = e * args.gap_time
         print(f"实际使用的时间范围[{s}, {e}]")
         sum_time += e - s
         try:
@@ -93,6 +99,6 @@ def cut_video(args):
             print(f"提取片段时出现异常，片段:[{s}, {e}],")
             continue
 
-    print(f"原时间:{clip.duration}，剪辑后的时长:{sum_time}")
+    print(f"原时间:{tmp_clip.duration}，剪辑后的时长:{sum_time}")
     final_clip = concatenate_videoclips(sub_clips)
     final_clip.write_videofile(args.output_file, threads=args.threads)
