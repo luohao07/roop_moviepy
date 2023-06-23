@@ -50,14 +50,10 @@ def cut_video_wrap(args):
     clip = VideoFileClip(args.input_file)
     accept_infos = [None] * int(clip.duration * clip.fps)
 
-    gap_time = args.gap_time
-    while True:
+    for gap_time in args.gap_times:
         print(f"开始剪辑gap_time={gap_time}")
         args.gap_time = gap_time
         cut_video(clip, accept_infos, args)
-        if gap_time <= 1.0 / clip.fps + 0.001:
-            break
-        gap_time = gap_time / 4.0
 
     cut_frames = get_index_range(accept_infos, args.accept_min_time * clip.fps)
     for arr in cut_frames:
@@ -65,8 +61,13 @@ def cut_video_wrap(args):
             arr[i] = arr[i] * 1.0 / clip.fps
 
     cut_times = cut_frames
-    new_clip = do_cut_to_clip(clip, args, cut_times)
-    new_clip.write_videofile(args.output_file, threads=args.threads)
+
+    try:
+        new_clip = do_cut_to_clip(clip, args, cut_times)
+        new_clip.write_videofile(args.output_file, threads=args.threads)
+    except:
+        print(f"合成失败！文件占用，现场已保存，可使用以下命令重试合成操作: ",
+              f"python repay_cut.py --i {args.input_file} -o {args.output_file} -f {args.input_file}.txt")
 
 
 def set_false_between(array, min_size):
@@ -88,6 +89,7 @@ def cut_video(clip, accept_infos, args):
         print(f"gap time 过低，重置为1/fps={args.gap_time}")
     get_face_analyser()
 
+    fail_count = 0
     with concurrent.futures.ThreadPoolExecutor(max_workers=args.threads) as executor:
         index = 0
         t = 0
@@ -100,6 +102,9 @@ def cut_video(clip, accept_infos, args):
                 except:
                     print(f"第{index}帧读取失败")
                     accept_infos[index] = False
+                    fail_count += 1
+                    if fail_count >= 10:
+                        break
             else:
                 progress.update(1)
             t += args.gap_time
