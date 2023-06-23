@@ -47,15 +47,17 @@ def is_accept(clip, t, index, accept_infos, progress, args):
 
 
 def copy_and_read_video(args, clips):
+    source_file_name = None
     with open(args.input_file, 'rb') as file:
         data = file.read()
         print(f"拷贝数据，读取成功，长度：{len(data)}")
+        source_file_name = file.name
     chunk_size = 4096
     num_chunks = len(data) // chunk_size
 
     for i in range(num_chunks):
         chunk_data = data[i * chunk_size: (i + 1) * chunk_size]
-        new_file_name = f'cache/{args.input_file}_{i}'
+        new_file_name = f'cache/{source_file_name}_{i}'
         with open(new_file_name, 'wb') as new_file:
             new_file.write(chunk_data)
             new_file.flush()
