@@ -50,24 +50,32 @@ def cut_video_wrap(args):
     clip = VideoFileClip(args.input_file)
     accept_infos = [None] * int(clip.duration * clip.fps)
 
-    last_gap_time = 4
-    while args.gap_time >= 1.0 / clip.fps + 0.001:  # 加0.001是为了防止精度误差
-        args.gap_time = clip.duration / 2000
-        args.gap_time = min(last_gap_time / 4.0, args.gap_time)  # 每次的精度至少是上一次的4倍
-        print(f"开始检测，当前视频时长{clip.duration}，检测gap_time={args.gap_time}")
-        clip = cut_video(clip, accept_infos, args)
-        last_gap_time = args.gap_time
+    # 先用accept_min_time检测一轮
+    args.gap_time = args.accept_min_time
+    cut_video(clip, accept_infos, args)
 
-    clip.write_videofile(args.output_file, threads=args.threads)
+    # 然后再精剪剩下的内容
+    args.gap_time = 0
+    cut_video(clip, accept_infos, args)
+
+    cut_frames = get_index_range(accept_infos, args.accept_min_time * clip.fps)
+    for arr in cut_frames:
+        for i in range(len(arr)):
+            arr[i] = arr[i] * 1.0 / clip.fps
+
+    cut_times = cut_frames
+    new_clip = do_cut_to_clip(clip, args, cut_times)
+    new_clip.write_videofile(args.output_file, threads=args.threads)
 
 
 def set_false_between(array, min_size):
     false_indices = [i for i, val in enumerate(array) if val is False]
 
     for i in range(len(false_indices) - 1):
-        if false_indices[i + 1] - false_indices[i] <= min_size:
+        if false_indices[i + 1] - false_indices[i] - 1 <= min_size:
             start_index = false_indices[i]
             end_index = false_indices[i + 1]
+            print(f"[{start_index}, {end_index}]之间的内容全部置为False")
             for j in range(start_index + 1, end_index):
                 array[j] = False
 
@@ -89,7 +97,7 @@ def cut_video(clip, accept_infos, args):
         while t <= clip.duration and index < len(accept_infos):
             if not (accept_infos[index] is None):
                 continue
-            #print(f"提交任务{index}")
+            # print(f"提交任务{index}")
             if args.max_time >= t >= args.min_time:
                 frame = clip.get_frame(t)
                 executor.submit(is_accept, frame, index, accept_infos, progress, args)
@@ -99,13 +107,8 @@ def cut_video(clip, accept_infos, args):
             index = int(t * clip.fps)
         print(f"任务提交结束：{t}, {index}, {len(accept_infos)}")
 
-    cut_times = get_index_range(accept_infos, args.accept_min_time * clip.fps)
     # 如果任何时间差小于accept_min_time的帧都为False，那中间的部分就不用检测了，直接设置为False
-    set_false_between(accept_infos, args.accept_min_time * clip.fps + 1)
-    for cut_time in cut_times:
-        for i in range(len(cut_time)):
-            cut_time[i] *= args.gap_time
-    return do_cut_to_clip(clip, args, cut_times)
+    set_false_between(accept_infos, args.accept_min_time * clip.fps)
 
 
 def do_cut_to_clip(clip, args, cut_times):
