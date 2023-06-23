@@ -60,7 +60,8 @@ def copy_and_read_video(args, clips):
 
 def cut_video(args):
     clips = [None] * (args.copies + 1)
-    threading.Thread(target=copy_and_read_video, args=(args, clips))
+    copy_and_read_video(args, clips);
+    # threading.Thread(target=copy_and_read_video, args=(args, clips))
     clips[0] = VideoFileClip(args.input_file)
     fps = clips[0].fps
     if args.gap_time < 1.0 / fps:
