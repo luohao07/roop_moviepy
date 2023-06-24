@@ -61,7 +61,7 @@ def copy_input_file(args):
         shutil.copy(args.input_file, copy_file_path)
         print(f"复制第{index}个文件成功：{copy_file_path}")
         files.append(copy_file_path)
-    return files
+    return files * 3
 
 
 def cut_video_wrap(args):
@@ -81,7 +81,7 @@ def cut_video_wrap(args):
               f"已过滤帧{accept_infos.count(False)}, 已接受帧{accept_infos.count(True)}")
         args.gap_time = gap_time
         with concurrent.futures.ThreadPoolExecutor(max_workers=len(clips)) as executor:
-            for task_i in range(args.copies + 1):
+            for task_i in range(len(clips)):
                 start_time = clips[0].duration / len(clips) * task_i
                 end_time = clips[0].duration / len(clips) * (task_i + 1)
                 print(f"提交第{index}轮第{task_i + 1}个任务，start_time={start_time}, end_time = {end_time}")
@@ -122,7 +122,7 @@ def cut_video(clip, accept_infos, args, start_time, end_time, progress):
     print(f"开始执行任务[{start_time}, {end_time}]")
 
     fail_count = 0
-    with concurrent.futures.ThreadPoolExecutor(max_workers=int(args.threads / (args.copies + 1))) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=args.threads) as executor:
         t = start_time
         index = int(t * clip.fps)
         while t <= end_time and index < len(accept_infos):
