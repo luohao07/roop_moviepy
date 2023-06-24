@@ -50,15 +50,15 @@ def is_accept(frame, index, accept_infos, progress, args):
 
 
 def copy_input_file(args):
-    # basename = os.path.basename(args.input_file)
-    # name, extension = os.path.splitext(basename)
-    # files = [args.input_file]
-    # for index in range(args.copies):
-    #     copy_file_path = f"{os.path.dirname(args.input_file)}/{name}_copy{index}{extension}"
-    #     shutil.copy(args.input_file, copy_file_path)
-    #     print(f"复制第{index}个文件成功：{copy_file_path}")
-    #     files.append(copy_file_path)
-    return [args.input_file] * (args.copies + 1)
+    basename = os.path.basename(args.input_file)
+    name, extension = os.path.splitext(basename)
+    files = [args.input_file]
+    for index in range(args.copies):
+        copy_file_path = f"{os.path.dirname(args.input_file)}/{name}_copy{index}{extension}"
+        shutil.copy(args.input_file, copy_file_path)
+        print(f"复制第{index}个文件成功：{copy_file_path}")
+        files.append(copy_file_path)
+    return files
 
 
 def cut_video_wrap(args):
@@ -148,10 +148,8 @@ def do_cut_to_clip(clip, args, cut_times, save_log = True):
                 "cut_times": cut_times
             }
             file.write(json.dumps(cut_info))
-    print(cut_times)
     for cut_time in cut_times:
         s, e = cut_time
-        print(f"实际使用的时间范围[{s}, {e}]")
         sum_time += e - s
         try:
             sc = clip.subclip(s, e)
