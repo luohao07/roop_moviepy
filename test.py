@@ -3,11 +3,12 @@ import argparse
 from moviepy.video.io.VideoFileClip import VideoFileClip
 
 
-def cut_with_audio(input, output):
-    clip = VideoFileClip(input)
+def cut_with_audio(input_file, output_file):
+    clip = VideoFileClip(input_file)
+    audio = clip.audio
     video_sub_clip = clip.subclip(100, 150)
-    print(args.output_file)
-    video_sub_clip.write_videofile(output, codec='libx264')
+    audio.write_audiofile(output_file)
+    # video_sub_clip.write_videofile(output_file, codec='libx264')
 
 
 if __name__ == '__main__':
