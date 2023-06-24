@@ -124,7 +124,6 @@ def cut_video(clip, accept_infos, args, start_time, end_time, progress):
         t = start_time
         index = int(t * clip.fps)
         while t <= end_time and index < len(accept_infos):
-            print(f"开始执行任务index={index}")
             if accept_infos[index] is None:
                 try:
                     frame = clip.get_frame(t)
@@ -139,7 +138,6 @@ def cut_video(clip, accept_infos, args, start_time, end_time, progress):
                 progress.update(1)
             t += args.gap_time
             index = int(t * clip.fps)
-        print(f"任务提交结束：{t}, {index}, {len(accept_infos)}")
 
 
 def do_cut_to_clip(clip, args, cut_times, save_log = True):
