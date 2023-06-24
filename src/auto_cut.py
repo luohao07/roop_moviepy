@@ -82,7 +82,7 @@ def cut_video_wrap(args):
                 start_time = clips[0].duration / len(clips) * task_i
                 end_time = clips[0].duration / len(clips) * (task_i + 1)
                 print(f"提交第{index}轮第{task_i + 1}个任务，start_time={start_time}, end_time = {end_time}")
-                executor.submit(cut_video, args=(clips[task_i], accept_infos, args, start_time, end_time, progress))
+                executor.submit(cut_video, clips[task_i], accept_infos, args, start_time, end_time, progress)
         # 如果任意两个时间差小于accept_min_time的帧都为False，那中间的部分就不用检测了，直接设置为False
         print(f"第{index}轮执行完成")
         set_false_between(accept_infos, args.accept_min_time * clips[0].fps)
