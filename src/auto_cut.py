@@ -70,7 +70,7 @@ def cut_video_wrap(args):
     accept_infos = [None] * int(clips[0].duration * clips[0].fps)
 
     for index, gap_time in enumerate(args.gap_times):
-        progress = tqdm(total=clips[0].duration / args.gap_time)
+        progress = tqdm(total=clips[0].duration / gap_time)
         print(f"开始第index轮剪辑gap_time={gap_time}，当前待检测帧{accept_infos.count(None)}，",
               f"已过滤帧{accept_infos.count(False)}, 已接受帧{accept_infos.count(True)}")
         args.gap_time = gap_time
