@@ -79,18 +79,18 @@ def cut_video_wrap(args):
         args.gap_time = gap_time
         with concurrent.futures.ThreadPoolExecutor(max_workers=len(clips)) as executor:
             for task_i in range(args.copies + 1):
-                clip = VideoFileClip(files[task_i])
                 start_time = clips[0].duration / len(clips) * task_i
                 end_time = clips[0].duration / len(clips) * (task_i + 1)
                 print(f"提交第{index}轮第{task_i + 1}个任务，start_time={start_time}, end_time = {end_time}")
-                executor.submit(cut_video, args=(clip, accept_infos, args, start_time, end_time, progress))
+                executor.submit(cut_video, args=(clips[task_i], accept_infos, args, start_time, end_time, progress))
         # 如果任意两个时间差小于accept_min_time的帧都为False，那中间的部分就不用检测了，直接设置为False
-        set_false_between(accept_infos, args.accept_min_time * clip.fps)
+        print(f"第{index}轮执行完成")
+        set_false_between(accept_infos, args.accept_min_time * clips[0].fps)
 
-    cut_frames = get_index_range(accept_infos, args.accept_min_time * clip.fps)
+    cut_frames = get_index_range(accept_infos, args.accept_min_time * clips[0].fps)
     for arr in cut_frames:
         for i in range(len(arr)):
-            arr[i] = arr[i] * 1.0 / clip.fps
+            arr[i] = arr[i] * 1.0 / clips[0].fps
     cut_times = cut_frames
 
     try:
