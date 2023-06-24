@@ -66,6 +66,7 @@ def copy_input_file(args):
 
 def cut_video_wrap(args):
     files = copy_input_file(args)
+    print(files)
     start_time = time.perf_counter()
     clips = []
     for file in files:
