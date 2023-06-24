@@ -55,6 +55,9 @@ def copy_input_file(args):
     files = [args.input_file]
     for index in range(args.copies):
         copy_file_path = f"{os.path.dirname(args.input_file)}/{name}_copy{index}{extension}"
+        if os.path.exists(copy_file_path):
+            print("第{index}个文件已存在，跳过")
+            continue
         shutil.copy(args.input_file, copy_file_path)
         print(f"复制第{index}个文件成功：{copy_file_path}")
         files.append(copy_file_path)
