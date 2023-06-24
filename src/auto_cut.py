@@ -64,7 +64,7 @@ def cut_video_wrap(args):
 
     try:
         new_clip = do_cut_to_clip(clip, args, cut_times)
-        new_clip.write_videofile(args.output_file, threads=args.threads)
+        new_clip.write_videofile(args.output_file, threads=args.threads, audio_codec='aac')
     except:
         print(f"合成失败！文件占用，现场已保存，可使用以下命令重试合成操作: ",
               f"python repay_cut.py --i {args.input_file} -o {args.output_file} -f {args.input_file}.txt")
