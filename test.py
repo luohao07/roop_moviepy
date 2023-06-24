@@ -10,7 +10,7 @@ def cut_with_audio(args):
 
     video_sub_clip.set_audio(audio_sub_clip)
 
-    video_sub_clip.write_videofile(args.output_file)
+    video_sub_clip.write_videofile(args.output_file, codec='libx264')
 
 
 if __name__ == '__main__':
