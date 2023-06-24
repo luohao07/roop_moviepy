@@ -1,5 +1,6 @@
 import concurrent.futures
 import json
+import time
 
 from moviepy.video.compositing.concatenate import concatenate_videoclips
 from moviepy.video.io.VideoFileClip import VideoFileClip
@@ -47,11 +48,14 @@ def is_accept(frame, index, accept_infos, progress, args):
 
 
 def cut_video_wrap(args):
+    start_time = time.perf_counter()
     clip = VideoFileClip(args.input_file)
+
     accept_infos = [None] * int(clip.duration * clip.fps)
 
-    for gap_time in args.gap_times:
-        print(f"开始剪辑gap_time={gap_time}")
+    for index, gap_time in enumerate(args.gap_times):
+        print(f"开始第index轮剪辑gap_time={gap_time}，当前待检测帧{accept_infos.count(None)}，",
+              f"已过滤帧{accept_infos.count(False)}, 已接受帧{accept_infos.count(True)}")
         args.gap_time = gap_time
         cut_video(clip, accept_infos, args)
 
@@ -68,6 +72,7 @@ def cut_video_wrap(args):
     except:
         print(f"合成失败！文件占用，现场已保存，可使用以下命令重试合成操作: ",
               f"python repay_cut.py --i {args.input_file} -o {args.output_file} -f {args.input_file}.txt")
+    print(f"剪辑完成，共计耗时: {time.perf_counter() - start_time}")
 
 
 def set_false_between(array, min_size):
