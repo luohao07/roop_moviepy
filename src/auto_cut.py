@@ -119,7 +119,7 @@ def cut_video(clip, accept_infos, args, start_time, end_time, progress):
     print(f"开始执行任务[{start_time}, {end_time}]")
 
     fail_count = 0
-    with concurrent.futures.ThreadPoolExecutor(max_workers=args.threads) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=int(args.threads / (args.copies + 1))) as executor:
         t = start_time
         index = int(t * clip.fps)
         while t <= end_time and index < len(accept_infos):
