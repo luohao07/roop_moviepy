@@ -66,7 +66,7 @@ def create_video(processed_frames, clip):
     data = range(len(processed_frames))
     processed_clip = DataVideoClip(data=data, data_to_frame=partial(get_processed_frame, processed_frames), fps=clip.fps)
     processed_clip = processed_clip.set_audio(clip.audio)
-    processed_clip.write_videofile(filename=globals.args.output_file, threads=globals.args.threads)
+    processed_clip.write_videofile(filename=globals.args.output_file, threads=globals.args.threads, audio_codec='aac')
 
 
 def get_processed_frame(processed_frames, t):
