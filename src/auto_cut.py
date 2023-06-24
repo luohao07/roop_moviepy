@@ -67,7 +67,7 @@ def copy_input_file(args):
 def cut_video_wrap(args):
     files = copy_input_file(args)
     print(files)
-    start_time = time.perf_counter()
+    cut_start_time = time.perf_counter()
     clips = []
     for file in files:
         clips.append(VideoFileClip(file))
@@ -103,7 +103,7 @@ def cut_video_wrap(args):
     except:
         print(f"合成失败！文件占用，现场已保存，可使用以下命令重试合成操作: ",
               f"python repay_cut.py --i {args.input_file} -o {args.output_file} -f {args.input_file}.txt")
-    print(f"剪辑完成，共计耗时: {time.perf_counter() - start_time}")
+    print(f"剪辑完成，共计耗时: {time.perf_counter() - cut_start_time}")
 
 
 def set_false_between(array, min_size):
