@@ -50,15 +50,15 @@ def is_accept(frame, index, accept_infos, progress, args):
 
 
 def copy_input_file(args):
-    basename = os.path.basename(args.input_file)
-    name, extension = os.path.splitext(basename)
-    files = [args.input_file]
-    for index in range(args.copies):
-        copy_file_path = f"{os.path.dirname(args.input_file)}/{name}_copy{index}{extension}"
-        shutil.copy(args.input_file, copy_file_path)
-        print(f"复制第{index}个文件成功：{copy_file_path}")
-        files.append(copy_file_path)
-    return files
+    # basename = os.path.basename(args.input_file)
+    # name, extension = os.path.splitext(basename)
+    # files = [args.input_file]
+    # for index in range(args.copies):
+    #     copy_file_path = f"{os.path.dirname(args.input_file)}/{name}_copy{index}{extension}"
+    #     shutil.copy(args.input_file, copy_file_path)
+    #     print(f"复制第{index}个文件成功：{copy_file_path}")
+    #     files.append(copy_file_path)
+    return [args.input_file] * (args.copies + 1)
 
 
 def cut_video_wrap(args):
@@ -68,7 +68,7 @@ def cut_video_wrap(args):
     for file in files:
         clips.append(VideoFileClip(file))
     accept_infos = [None] * int(clips[0].duration * clips[0].fps)
-
+    get_face_analyser()
     for index, gap_time in enumerate(args.gap_times):
         if gap_time < 1.0 / clips[0].fps:
             gap_time = 1.0 / clips[0].fps
@@ -117,7 +117,6 @@ def set_false_between(array, min_size):
 
 def cut_video(clip, accept_infos, args, start_time, end_time, progress):
     print(f"开始执行任务[{start_time}, {end_time}]")
-    get_face_analyser()
 
     fail_count = 0
     with concurrent.futures.ThreadPoolExecutor(max_workers=int(args.threads / (args.copies + 1))) as executor:
