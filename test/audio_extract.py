@@ -4,7 +4,7 @@ from moviepy.video.io.VideoFileClip import VideoFileClip
 
 
 def traverse_videos(folder_path):
-    video_extensions = ['.mp4', '.avi', '.mkv', '.mov', '.rmvb']  # 可根据需要添加其他视频文件扩展名
+    video_extensions = ['.mp4', '.avi', '.mkv', '.mov']  # 可根据需要添加其他视频文件扩展名
 
     for root, dirs, files in os.walk(folder_path):
         for file in files:

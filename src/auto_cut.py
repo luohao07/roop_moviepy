@@ -53,16 +53,16 @@ def copy_input_file(args):
     basename = os.path.basename(args.input_file)
     name, extension = os.path.splitext(basename)
     files = [args.input_file]
-    for index in range(args.copies):
-        copy_file_path = f"{os.path.dirname(args.input_file)}/{name}_copy{index}{extension}"
-        if os.path.exists(copy_file_path):
-            print("第{index}个文件已存在，跳过")
-            files.append(copy_file_path)
-            continue
-        shutil.copy(args.input_file, copy_file_path)
-        print(f"复制第{index}个文件成功：{copy_file_path}")
-        files.append(copy_file_path)
-    return files * 3
+    # for index in range(args.copies):
+    #     copy_file_path = f"{os.path.dirname(args.input_file)}/{name}_copy{index}{extension}"
+    #     if os.path.exists(copy_file_path):
+    #         print("第{index}个文件已存在，跳过")
+    #         files.append(copy_file_path)
+    #         continue
+    #     shutil.copy(args.input_file, copy_file_path)
+    #     print(f"复制第{index}个文件成功：{copy_file_path}")
+    #     files.append(copy_file_path)
+    return files * args.copies
 
 
 def cut_video_wrap(args):
@@ -100,7 +100,7 @@ def cut_video_wrap(args):
 
     try:
         new_clip = do_cut_to_clip(clips[0], args, cut_times)
-        new_clip.write_videofile(args.output_file, threads=args.threads * (args.copies + 1) * 3, audio_codec='aac')
+        new_clip.write_videofile(args.output_file, threads=args.threads * args.copies, audio_codec='aac')
     except:
         print(f"合成失败！文件占用，现场已保存，可使用以下命令重试合成操作: ",
               f"python repay_cut.py --i {args.input_file} -o {args.output_file} -f {args.input_file}.txt")
