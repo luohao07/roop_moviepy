@@ -40,18 +40,12 @@ def handle_frames(frames, processed_frames):
 
 
 # 加载帧
-def extract_frames(clips, frames):
-    time_per_frame = 1.0 / clips[0].fps
-
-    def do_extract_frames(clip, start_index, step):
-        cur_index = start_index
-        while cur_index < len(frames):
-            frames[cur_index] = clip.get_frame(time_per_frame * cur_index)
-            cur_index += step
-
-    with concurrent.futures.ThreadPoolExecutor(max_workers=len(clips)) as executor:
-        for i in range(len(clips)):
-            executor.submit(do_extract_frames, args=(clips[i], i, len(clips)))
+def extract_frames(clip, start_index, step, frames):
+    time_per_frame = 1 / clip.fps
+    cur_index = start_index
+    while cur_index < len(frames):
+        frames[cur_index] = clip.get_frame(time_per_frame * cur_index)
+        cur_index += step
 
 
 def print_status_info(frames, processed_frames):
@@ -72,7 +66,8 @@ def process_video():
     get_face_analyser()
     globals.args.all_faces = read_all_faces(globals.args.source_imgs)
 
-    threading.Thread(target=extract_frames, args=(clips, frames)).start()
+    for i, clip in enumerate(clips):
+        threading.Thread(target=extract_frames, args=(clip, i, len(clips), frames)).start()
     threading.Thread(target=handle_frames, args=(frames, processed_frames)).start()
     threading.Thread(target=print_status_info, args=(frames, processed_frames)).start()
 
