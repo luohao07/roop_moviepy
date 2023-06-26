@@ -11,7 +11,6 @@ from src.swapper import process_frame, read_all_faces
 import time
 import src.globals as globals
 
-
 wait_times = [0, 0, 0]
 
 
@@ -28,7 +27,7 @@ def handle_frame(frames, index, processed_frames):
     except Exception as e:
         print(e)
         frame = frames[index]
-    frames[index] = None # 释放内存
+    frames[index] = None  # 释放内存
     processed_frames[index] = frame
     if globals.args.log_level == "DEBUG":
         print(f"完成换脸帧{index}")
@@ -41,13 +40,18 @@ def handle_frames(frames, processed_frames):
 
 
 # 加载帧
-def extract_frames(clip, frames):
-    index = 0
-    for frame in clip.iter_frames():
-        if index >= len(frames):
-            break
-        frames[index] = frame
-        index += 1
+def extract_frames(clips, frames):
+    time_per_frame = 1.0 / clips[0].fps
+
+    def do_extract_frames(clip, start_index, step):
+        cur_index = start_index
+        while cur_index < len(frames):
+            frames[cur_index] = clip.get_frame(time_per_frame * cur_index)
+            cur_index += step
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=len(clips)) as executor:
+        for i in range(len(clips)):
+            executor.submit(do_extract_frames, args=(clips[i], i, len(clips)))
 
 
 def print_status_info(frames, processed_frames):
@@ -58,14 +62,17 @@ def print_status_info(frames, processed_frames):
 
 def process_video():
     start_time = time.perf_counter()
-    clip = VideoFileClip(globals.args.input_file)
+    clips = []
+    for i in range(3):
+        clips.append(VideoFileClip(globals.args.input_file))
+    clip = clips[0]
     frames = [None] * int(clip.fps * clip.duration)
     processed_frames = [None] * len(frames)
 
     get_face_analyser()
     globals.args.all_faces = read_all_faces(globals.args.source_imgs)
 
-    threading.Thread(target=extract_frames, args=(clip, frames)).start()
+    threading.Thread(target=extract_frames, args=(clips, frames)).start()
     threading.Thread(target=handle_frames, args=(frames, processed_frames)).start()
     threading.Thread(target=print_status_info, args=(frames, processed_frames)).start()
 
@@ -76,7 +83,8 @@ def process_video():
 
 def create_video(processed_frames, clip):
     data = range(len(processed_frames))
-    processed_clip = DataVideoClip(data=data, data_to_frame=partial(get_processed_frame, processed_frames), fps=clip.fps)
+    processed_clip = DataVideoClip(data=data, data_to_frame=partial(get_processed_frame, processed_frames),
+                                   fps=clip.fps)
     processed_clip = processed_clip.set_audio(clip.audio)
     processed_clip.write_videofile(filename=globals.args.output_file, threads=globals.args.threads, audio_codec='aac')
 
@@ -89,7 +97,7 @@ def get_processed_frame(processed_frames, t):
         time.sleep(globals.args.sleep_time)
     processed_frame = processed_frames[t]
     if t >= 3:
-        processed_frames[t-3] = None
+        processed_frames[t - 3] = None
     if globals.args.log_level == "DEBUG":
         print(f"返回帧{t}")
     return processed_frame
