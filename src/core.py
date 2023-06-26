@@ -12,12 +12,16 @@ import time
 import src.globals as globals
 
 
+wait_times = [0, 0, 0]
+
+
 # 处理帧
 def handle_frame(frames, index, processed_frames):
     if globals.args.log_level == "DEBUG":
         print(f"开始换脸帧{index}")
     # 没值说明没有读取成功
     while frames[index] is None:
+        wait_times[1] = wait_times[1] + 1
         time.sleep(globals.args.sleep_time)
     try:
         frame = process_frame(frames[index])
@@ -46,6 +50,12 @@ def extract_frames(clip, frames):
         index += 1
 
 
+def print_status_info(frames, processed_frames):
+    while True:
+        print(f"正在执行中，当前等待信息{wait_times}")
+        time.sleep(5)
+
+
 def process_video():
     start_time = time.perf_counter()
     clip = VideoFileClip(globals.args.input_file)
@@ -57,9 +67,11 @@ def process_video():
 
     threading.Thread(target=extract_frames, args=(clip, frames)).start()
     threading.Thread(target=handle_frames, args=(frames, processed_frames)).start()
+    threading.Thread(target=print_status_info, args=(frames, processed_frames)).start()
 
     create_video(processed_frames, clip)
     print(f"处理完成，耗时{time.perf_counter() - start_time}")
+    print(f"各阶段等待次数：{wait_times}")
 
 
 def create_video(processed_frames, clip):
@@ -73,6 +85,7 @@ def get_processed_frame(processed_frames, t):
     if globals.args.log_level == "DEBUG":
         print(f"获取帧{t}")
     while processed_frames[t] is None:
+        wait_times[2] = wait_times[2] + 1
         time.sleep(globals.args.sleep_time)
     processed_frame = processed_frames[t]
     if t >= 3:

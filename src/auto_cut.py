@@ -1,7 +1,6 @@
 import concurrent.futures
 import json
 import os
-import shutil
 import time
 
 from moviepy.video.compositing.concatenate import concatenate_videoclips
