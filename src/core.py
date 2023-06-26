@@ -40,12 +40,20 @@ def handle_frames(frames, processed_frames):
 
 
 # 加载帧
-def extract_frames(clip, start_index, step, frames):
+def extract_frames(clip, thread_index, thread_count, frames):
     time_per_frame = 1 / clip.fps
-    cur_index = start_index
+    cur_index = thread_index * 1000
+    print(f"第{thread_index}个线程开始执行，起始id: {cur_index}")
+
+    count = 0
     while cur_index < len(frames):
         frames[cur_index] = clip.get_frame(time_per_frame * cur_index)
-        cur_index += step
+        cur_index += 1
+        count += 1
+        if count == 1000:
+            print(f"第{thread_index}个线程执行到{cur_index}，将跳转到{cur_index + thread_count * 1000}执行")
+            count = 0
+            cur_index += thread_count * 1000
 
 
 def print_status_info(frames, processed_frames):
