@@ -72,7 +72,19 @@ def cut_video_wrap(args):
     clips = []
     for file in files:
         clips.append(VideoFileClip(file))
+
     accept_infos = [None] * int(clips[0].duration * clips[0].fps)
+    if not args.gap_times or len(args.gap_times) == 0:
+        if len(accept_infos) > 10 * 10000:
+            args.gap_times = [2, 0.4, 0.08, 0]
+        if len(accept_infos) > 3 * 10000:
+            args.gap_times = [0.4, 0.08, 0]
+        if len(accept_infos) > 1 * 10000:
+            args.gap_times = [0.4, 0]
+        else:
+            args.gap_times = [0]
+
+
     get_face_analyser()
     for index, gap_time in enumerate(args.gap_times):
         if gap_time < 1.0 / clips[0].fps:
