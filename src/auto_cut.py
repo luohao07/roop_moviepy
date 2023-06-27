@@ -77,9 +77,9 @@ def cut_video_wrap(args):
     if not args.gap_times or len(args.gap_times) == 0:
         if len(accept_infos) > 10 * 10000:
             args.gap_times = [2, 0.4, 0.08, 0]
-        if len(accept_infos) > 3 * 10000:
+        elif len(accept_infos) > 3 * 10000:
             args.gap_times = [0.8, 0.1, 0]
-        if len(accept_infos) > 1 * 10000:
+        elif len(accept_infos) > 1 * 10000:
             args.gap_times = [0.4, 0]
         else:
             args.gap_times = [0]
