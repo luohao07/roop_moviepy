@@ -78,11 +78,12 @@ def cut_video_wrap(args):
         if len(accept_infos) > 10 * 10000:
             args.gap_times = [2, 0.4, 0.08, 0]
         if len(accept_infos) > 3 * 10000:
-            args.gap_times = [0.4, 0.08, 0]
+            args.gap_times = [0.8, 0.1, 0]
         if len(accept_infos) > 1 * 10000:
             args.gap_times = [0.4, 0]
         else:
             args.gap_times = [0]
+        print(f"自动选择gap_times完毕{args.gap_times}")
 
 
     get_face_analyser()
