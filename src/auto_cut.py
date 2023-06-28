@@ -105,7 +105,13 @@ def set_false_out_times(accept_infos, clip, args):
 
 
 def count_nones(accept_infos, start_index, end_index):
-    return sum(1 for element in accept_infos[start_index:end_index+1] if element is None)
+    index = start_index
+    count = 0
+    while index <= end_index:
+        if accept_infos[index] is None:
+            count += 1
+        index += 1
+    return count
 
 
 def cut_video_wrap(args):
