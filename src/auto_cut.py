@@ -88,6 +88,8 @@ def count_frame(accept_infos):
 
 def set_false_out_times(accept_infos, clip, args):
     if not (args.min_time or args.max_time):
+        args.min_time = 0
+        args.max_time = clip.duration
         return
 
     if not args.min_time:
@@ -119,14 +121,14 @@ def cut_video_wrap(args):
         if gap_time < 1.0 / clips[0].fps:
             gap_time = 1.0 / clips[0].fps
             print(f"gap time 过低，重置为1/fps={gap_time}")
-        progress = tqdm(total=clips[0].duration / gap_time)
+        progress = tqdm((args.max_time - args.min_time) / gap_time)
         print(f"开始第{index}轮剪辑gap_time={gap_time}，当前待检测帧{accept_infos.count(None)}，",
               f"已过滤帧{accept_infos.count(False)}, 已接受帧{accept_infos.count(True)}")
         args.gap_time = gap_time
         with concurrent.futures.ThreadPoolExecutor(max_workers=len(clips)) as executor:
             for task_i in range(len(clips)):
-                start_time = clips[0].duration / len(clips) * task_i
-                end_time = clips[0].duration / len(clips) * (task_i + 1)
+                start_time = (args.max_time - args.min_time) / len(clips) * task_i + args.min_time
+                end_time = (args.max_time - args.min_time) / len(clips) * (task_i + 1) + args.min_time
                 print(f"提交第{index}轮第{task_i + 1}个任务，start_time={start_time}, end_time = {end_time}")
                 executor.submit(cut_video, clips[task_i], accept_infos, args, start_time, end_time, progress)
         # 如果任意两个时间差小于accept_min_time的帧都为False，那中间的部分就不用检测了，直接设置为False
