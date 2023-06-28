@@ -111,8 +111,8 @@ def cut_video_wrap(args):
         clips.append(VideoFileClip(file))
 
     accept_infos = [None] * int(clips[0].duration * clips[0].fps)
-    init_gap_times(args, len(accept_infos))
     set_false_out_times(accept_infos, clips[0], args)
+    init_gap_times(args, accept_infos.count(None))
 
     get_face_analyser()
     for index, gap_time in enumerate(args.gap_times):
