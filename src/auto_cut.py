@@ -104,6 +104,10 @@ def set_false_out_times(accept_infos, clip, args):
             accept_infos[index] = False
 
 
+def count_nones(accept_infos, start_index, end_index):
+    return sum(1 for element in accept_infos[start_index:end_index+1] if element is None)
+
+
 def cut_video_wrap(args):
     files = copy_input_file(args)
     print(files)
@@ -121,7 +125,7 @@ def cut_video_wrap(args):
         if gap_time < 1.0 / clips[0].fps:
             gap_time = 1.0 / clips[0].fps
             print(f"gap time 过低，重置为1/fps={gap_time}")
-        progress = tqdm(total=int((args.max_time - args.min_time) / gap_time))
+        progress = tqdm(total=count_nones(accept_infos, args.min_time * clips[0].duration, args.max_time * clips[0].duration))
         print(f"开始第{index}轮剪辑gap_time={gap_time}，当前待检测帧{accept_infos.count(None)}，",
               f"已过滤帧{accept_infos.count(False)}, 已接受帧{accept_infos.count(True)}")
         args.gap_time = gap_time
