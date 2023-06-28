@@ -185,8 +185,6 @@ def cut_video(clip, accept_infos, args, start_time, end_time, progress):
                     fail_count += 1
                     if fail_count >= 10:
                         break
-            else:
-                progress.update(1)
             t += args.gap_time
             index = int(t * clip.fps)
 
