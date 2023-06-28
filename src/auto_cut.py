@@ -65,6 +65,43 @@ def copy_input_file(args):
     return files * args.copies
 
 
+def init_gap_times(args, frame_size):
+    if not args.gap_times or len(args.gap_times) == 0:
+        if frame_size > 10 * 10000:
+            args.gap_times = [2, 0.4, 0.08, 0]
+        elif frame_size > 3 * 10000:
+            args.gap_times = [0.8, 0.1, 0]
+        elif frame_size > 1 * 10000:
+            args.gap_times = [0.4, 0]
+        else:
+            args.gap_times = [0]
+        print(f"自动选择gap_times完毕{args.gap_times}")
+
+
+def count_frame(accept_infos):
+    return {
+        "accept": accept_infos.count(True),
+        "deny": accept_infos.count(False),
+        "uncheck": accept_infos.count(None)
+    }
+
+
+def set_false_out_times(accept_infos, clip, args):
+    if not (args.min_time or args.max_time):
+        return
+
+    if not args.min_time:
+        args.min_time = 0
+
+    if not args.max_time:
+        args.max_time = clip.duration
+
+    for index in range(len(accept_infos)):
+        t = index * 1.0 / clip.fps
+        if t < args.min_time or t > args.max_time:
+            accept_infos[index] = False
+
+
 def cut_video_wrap(args):
     files = copy_input_file(args)
     print(files)
@@ -74,17 +111,8 @@ def cut_video_wrap(args):
         clips.append(VideoFileClip(file))
 
     accept_infos = [None] * int(clips[0].duration * clips[0].fps)
-    if not args.gap_times or len(args.gap_times) == 0:
-        if len(accept_infos) > 10 * 10000:
-            args.gap_times = [2, 0.4, 0.08, 0]
-        elif len(accept_infos) > 3 * 10000:
-            args.gap_times = [0.8, 0.1, 0]
-        elif len(accept_infos) > 1 * 10000:
-            args.gap_times = [0.4, 0]
-        else:
-            args.gap_times = [0]
-        print(f"自动选择gap_times完毕{args.gap_times}")
-
+    init_gap_times(args, len(accept_infos))
+    set_false_out_times(accept_infos, clips[0], args)
 
     get_face_analyser()
     for index, gap_time in enumerate(args.gap_times):
@@ -92,7 +120,7 @@ def cut_video_wrap(args):
             gap_time = 1.0 / clips[0].fps
             print(f"gap time 过低，重置为1/fps={gap_time}")
         progress = tqdm(total=clips[0].duration / gap_time)
-        print(f"开始第index轮剪辑gap_time={gap_time}，当前待检测帧{accept_infos.count(None)}，",
+        print(f"开始第{index}轮剪辑gap_time={gap_time}，当前待检测帧{accept_infos.count(None)}，",
               f"已过滤帧{accept_infos.count(False)}, 已接受帧{accept_infos.count(True)}")
         args.gap_time = gap_time
         with concurrent.futures.ThreadPoolExecutor(max_workers=len(clips)) as executor:
