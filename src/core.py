@@ -52,10 +52,14 @@ def extract_frames(clip, frames):
 
 def print_info(frames, processed_frames):
     while True:
-        wait_frame_count = len(frames) - frames.count(None)
-        wait_write_count = len(processed_frames) - processed_frames.count(None)
-        print(f"等待次数：{wait_times}，等待处理数量{wait_frame_count}, 等待写入数量{wait_write_count}")
+        try:
+            wait_frame_count = len(frames) - frames.count(None)
+            wait_write_count = len(processed_frames) - processed_frames.count(None)
+            print(f"等待次数：{wait_times}，等待处理数量{wait_frame_count}, 等待写入数量{wait_write_count}")
+        except Exception as e:
+            pass
         time.sleep(5)
+
 
 def process_video():
     start_time = time.perf_counter()
