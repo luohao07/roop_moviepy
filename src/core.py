@@ -53,10 +53,19 @@ def extract_frames(clip, frames):
 def print_info(frames, processed_frames):
     while True:
         try:
-            wait_frame_count = len(frames) - frames.count(None)
-            wait_write_count = len(processed_frames) - processed_frames.count(None)
+            wait_frame_count = 0
+            for f in frames:
+                if f is not None:
+                    wait_frame_count += 1
+
+            wait_write_count = 0
+            for f in processed_frames:
+                if f is not None:
+                    wait_write_count += 1
+
             print(f"等待次数：{wait_times}，等待处理数量{wait_frame_count}, 等待写入数量{wait_write_count}")
         except Exception as e:
+            print(e)
             pass
         time.sleep(5)
 
