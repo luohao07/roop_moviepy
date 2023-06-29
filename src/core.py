@@ -66,7 +66,7 @@ def process_video():
     get_face_analyser()
     globals.args.all_faces = read_all_faces(globals.args.source_imgs)
 
-    threading.Thread(target=print_info, args=(frames, processed_frames))
+    threading.Thread(target=print_info, args=(frames, processed_frames)).start()
     threading.Thread(target=extract_frames, args=(clip, frames)).start()
     threading.Thread(target=handle_frames, args=(frames, processed_frames)).start()
 
