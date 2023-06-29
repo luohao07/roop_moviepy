@@ -12,12 +12,15 @@ import time
 import src.globals as globals
 
 
+wait_times = [0, 0]
+
 # 处理帧
 def handle_frame(frames, index, processed_frames):
     if globals.args.log_level == "DEBUG":
         print(f"开始换脸帧{index}")
     # 没值说明没有读取成功
     while frames[index] is None:
+        wait_times[0] += 1
         time.sleep(globals.args.sleep_time)
     try:
         frame = process_frame(frames[index])
@@ -44,7 +47,15 @@ def extract_frames(clip, frames):
             break
         frames[index] = frame
         index += 1
+    print("extract finish!")
 
+
+def print_info(frames, processed_frames):
+    while True:
+        wait_frame_count = len(frames) - frames.count(None)
+        wait_write_count = len(processed_frames) - processed_frames.count(None)
+        print(f"等待次数：{wait_times}，等待处理数量{wait_frame_count}, 等待写入数量{wait_write_count}")
+        time.sleep(5)
 
 def process_video():
     start_time = time.perf_counter()
@@ -55,6 +66,7 @@ def process_video():
     get_face_analyser()
     globals.args.all_faces = read_all_faces(globals.args.source_imgs)
 
+    threading.Thread(target=print_info, args=(frames, processed_frames))
     threading.Thread(target=extract_frames, args=(clip, frames)).start()
     threading.Thread(target=handle_frames, args=(frames, processed_frames)).start()
 
@@ -73,6 +85,7 @@ def get_processed_frame(processed_frames, t):
     if globals.args.log_level == "DEBUG":
         print(f"获取帧{t}")
     while processed_frames[t] is None:
+        wait_times[0] += 1
         time.sleep(globals.args.sleep_time)
     processed_frame = processed_frames[t]
     if t >= 3:
