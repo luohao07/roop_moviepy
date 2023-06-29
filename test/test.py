@@ -1,24 +1,12 @@
-import unittest
-from argparse import Namespace
+import time
 
-
-def proccess():
- print(args)
-
-
-class TestMain(unittest.TestCase):
-
-    def test_main(self):
-        # 构造参数命名空间对象
-        args = Namespace(log_level="DEBUG",input_file='../asserts/d3.mp4', output_file='../output/output_video.mp4', source_imgs=['../asserts/hy.jpeg'], threads=10)
-        # 调用 main 函数
-        # main(args)
-
-        proccess()
-
-        # 在这里添加您的测试断言
-        # ...
-
+from moviepy.video.io.VideoFileClip import VideoFileClip
+from tqdm import tqdm
 
 if __name__ == '__main__':
-    unittest.main()
+    start = time.perf_counter()
+    clip = VideoFileClip("./asserts/CJOD-320_01.mp4")
+    progress = tqdm(total=clip.fps*clip.duration)
+    for frame in clip.iter_frames():
+        progress.update(1)
+
