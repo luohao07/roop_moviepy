@@ -95,7 +95,7 @@ def create_video(processed_frames, clip, audio_file):
                                    fps=clip.fps)
     processed_clip = processed_clip.set_audio(clip.audio)
     processed_clip.write_videofile(filename=globals.args.output_file, threads=globals.args.threads, audio_codec='aac',
-                                   audio_file=audio_file)
+                                   audio=audio_file)
 
 
 def get_processed_frame(processed_frames, index):
