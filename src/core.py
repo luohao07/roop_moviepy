@@ -7,12 +7,13 @@ from moviepy.editor import VideoFileClip
 from moviepy.video.VideoClip import DataVideoClip
 
 from src.analyser import get_face_analyser
+from src.moviepy_utils import save_clip_audio
 from src.swapper import process_frame, read_all_faces
 import time
 import src.globals as globals
 
-
 wait_times = [0, 0]
+
 
 # 处理帧
 def handle_frame(frames, index, processed_frames):
@@ -27,7 +28,7 @@ def handle_frame(frames, index, processed_frames):
     except Exception as e:
         print(e)
         frame = frames[index]
-    frames[index] = None # 释放内存
+    frames[index] = None  # 释放内存
     processed_frames[index] = frame
     if globals.args.log_level == "DEBUG":
         print(f"完成换脸帧{index}")
@@ -78,33 +79,35 @@ def process_video():
 
     get_face_analyser()
     globals.args.all_faces = read_all_faces(globals.args.source_imgs)
+    audio_file = save_clip_audio(clip, video_filename=globals.args.input_file)
 
     threading.Thread(target=print_info, args=(frames, processed_frames)).start()
     threading.Thread(target=extract_frames, args=(clip, frames)).start()
     threading.Thread(target=handle_frames, args=(frames, processed_frames)).start()
 
-    create_video(processed_frames, clip)
+    create_video(processed_frames, clip, audio_file)
     print(f"处理完成，耗时{time.perf_counter() - start_time}")
 
 
-def create_video(processed_frames, clip):
+def create_video(processed_frames, clip, audio_file):
     data = range(len(processed_frames))
-    processed_clip = DataVideoClip(data=data, data_to_frame=partial(get_processed_frame, processed_frames), fps=clip.fps)
+    processed_clip = DataVideoClip(data=data, data_to_frame=partial(get_processed_frame, processed_frames),
+                                   fps=clip.fps)
     processed_clip = processed_clip.set_audio(clip.audio)
-    processed_clip.write_videofile(filename=globals.args.output_file, threads=globals.args.threads, audio_codec='aac')
+    processed_clip.write_videofile(filename=globals.args.output_file, threads=globals.args.threads, audio_codec='aac',
+                                   audio_file=audio_file)
 
 
-def get_processed_frame(processed_frames, t):
+def get_processed_frame(processed_frames, index):
     if globals.args.log_level == "DEBUG":
-        print(f"获取帧{t}")
-    while processed_frames[t] is None:
+        print(f"获取帧{index}")
+    while processed_frames[index] is None:
         wait_times[0] += 1
         time.sleep(globals.args.sleep_time)
-    processed_frame = processed_frames[t]
-    if t >= 3:
-        processed_frames[t-3] = None
-    if globals.args.log_level == "DEBUG":
-        print(f"返回帧{t}")
+    processed_frame = processed_frames[index]
+    # 这里是释放内存，获取index+1时说明index帧已经处理完了
+    if index >= 1:
+        processed_frames[index - 1] = None
     return processed_frame
 
 
