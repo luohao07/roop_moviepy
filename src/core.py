@@ -47,15 +47,15 @@ def extract_frames(clip, frames):
         if index >= len(frames):
             break
         frames[index] = frame
-        if index % 200 == 0:
+        if index % globals.args.max_cache_frames == 0:
             # 每加载完200帧，检查一下待处理的数量，太多了就暂停一会
             while True:
                 wait_frame_count = 0
                 for f in frames:
                     if f is not None:
                         wait_frame_count += 1
-                if wait_frame_count >= 200:
-                    time.sleep(5)
+                if wait_frame_count >= globals.args.max_cache_frames:
+                    time.sleep(2)
                 else:
                     break
         index += 1
