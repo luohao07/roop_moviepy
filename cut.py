@@ -15,6 +15,6 @@ if __name__ == '__main__':
     parser.add_argument('-amt', '--accept_min_time', type=float, help='accept_min_time', default=2)
     parser.add_argument('-maxt', '--max_time', type=float, help='max_time', default=None)
     parser.add_argument('-mint', '--min_time', type=float, help='min_time', default=None)
-    parser.add_argument('-cp', '--copies', type=int, help='copies', default=2)
+    parser.add_argument('-cp', '--copies', type=int, help='copies', default=1)
     args = parser.parse_args()
     cut_video_wrap(args)

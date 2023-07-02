@@ -63,6 +63,7 @@ def extract_frames(clip, frames):
 
 
 def print_info(frames, processed_frames):
+    zero_count_times = 0
     while True:
         try:
             wait_frame_count = 0
@@ -74,6 +75,10 @@ def print_info(frames, processed_frames):
             for f in processed_frames:
                 if f is not None:
                     wait_write_count += 1
+            if wait_frame_count == 0 and wait_write_count == 0:
+                zero_count_times += 1
+                if zero_count_times >= 4:
+                    break
 
             print(f"等待次数：{wait_times}，等待处理数量{wait_frame_count}, 等待写入数量{wait_write_count}")
         except Exception as e:
@@ -92,7 +97,7 @@ def process_video():
     globals.args.all_faces = read_all_faces(globals.args.source_imgs)
     audio_file = save_clip_audio(clip, video_filename=globals.args.input_file)
 
-    threading.Thread(target=print_info, args=(frames, processed_frames)).start()
+    # threading.Thread(target=print_info, args=(frames, processed_frames)).start()
     threading.Thread(target=extract_frames, args=(clip, frames)).start()
     threading.Thread(target=handle_frames, args=(frames, processed_frames)).start()
 
