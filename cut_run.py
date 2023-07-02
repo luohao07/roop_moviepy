@@ -9,7 +9,6 @@ from src.core import main
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Video processing using MoviePy')
     parser.add_argument('-i', '--input_file', type=str, help='Input video file')
-    parser.add_argument('-o', '--output_file', type=str, help='Output video file')
     parser.add_argument('-f', '--source_imgs', nargs='+', type=str, help='Image file paths')
     parser.add_argument('-tn', '--threads', type=int, help='threads', default=29)
     parser.add_argument('-l', '--log_level', type=str, help='log level', default="INFO")
@@ -26,13 +25,13 @@ if __name__ == '__main__':
     parser.add_argument('-mint', '--min_time', type=float, help='min_time', default=None)
     parser.add_argument('-cp', '--copies', type=int, help='copies', default=1)
 
-    parser.add_argument('-st', '--split_time', type=int, help='split_time', default=1200)
+    parser.add_argument('-it', '--item_time', type=int, help='split_time', default=1200)
 
     args = parser.parse_args()
 
     source_clip = VideoFileClip(args.input_file)
     start_time = 0
-    end_time = args.split_time
+    end_time = args.item_time
     name, ext = os.path.splitext(args.input_file)
     face_file_identify = ""
     for face_file in args.source_imgs:
@@ -56,3 +55,5 @@ if __name__ == '__main__':
                                        max_cache_frames=500)
         main(swap_args)
         print(f"换脸完成，输出路径：{out_file_name}")
+        start_time += args.item_time
+        end_time += args.item_time
