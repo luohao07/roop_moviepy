@@ -46,7 +46,7 @@ if __name__ == '__main__':
         cut_args = argparse.Namespace(female_min=args.female_min, female_max=args.female_max, male_min=args.male_min,
                                       male_max=args.male_max, accept_min_time=args.accept_min_time, max_time=end_time,
                                       min_time=start_time, copies=args.copies, input_file=args.input_file,
-                                      threads=args.threads, output_file=cut_file_name, gap_time=[0])
+                                      threads=args.threads, output_file=cut_file_name, gap_times=[0])
         cut_video_wrap(cut_args)
         print(f"剪辑已完成：{cut_file_name}")
 
