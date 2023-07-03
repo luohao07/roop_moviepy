@@ -68,3 +68,4 @@ if __name__ == '__main__':
             break
         if end_time >= args.max_time:
             end_time = args.max_time
+        index += 1
