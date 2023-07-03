@@ -56,7 +56,7 @@ if __name__ == '__main__':
         print(f"剪辑已完成：{cut_file_name}")
 
         if not os.path.exists(out_file_name):
-            swap_args = argparse.Namespace(nput_file=cut_file_name, threads=args.threads, output_file=cut_file_name,
+            swap_args = argparse.Namespace(input_file=cut_file_name, threads=args.threads, output_file=cut_file_name,
                                            source_imgs=args.source_imgs, log_level='INFO', gender='female', sleep_time=0.01,
                                            max_cache_frames=500)
             main(swap_args)
