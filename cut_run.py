@@ -30,30 +30,41 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     source_clip = VideoFileClip(args.input_file)
-    start_time = 0
+    start_time = args.min_time
     end_time = args.item_time
+    if not args.max_time:
+        args.max_time = source_clip.duration
+
     name, ext = os.path.splitext(args.input_file)
     face_file_identify = ""
     for face_file in args.source_imgs:
         face_file_name, face_file_ext = os.path.splitext(os.path.basename(face_file))
         face_file_identify += "_" + face_file_name
     index = 0
+
     while True:
         cut_file_name = f"{name}_{index}{ext}"
         out_file_name = f"{name}_{index}{face_file_identify}{ext}"
         print(
             f"开始处理第{index + 1}段，开始时间{start_time},结束时间{end_time},剪辑文件保存至{cut_file_name},输出文件保存至{out_file_name}")
-        cut_args = argparse.Namespace(female_min=args.female_min, female_max=args.female_max, male_min=args.male_min,
-                                      male_max=args.male_max, accept_min_time=args.accept_min_time, max_time=end_time,
-                                      min_time=start_time, copies=args.copies, input_file=args.input_file,
-                                      threads=args.threads, output_file=cut_file_name, gap_times=None)
-        cut_video_wrap(cut_args)
+        if os.path.exists(cut_file_name):
+            cut_args = argparse.Namespace(female_min=args.female_min, female_max=args.female_max, male_min=args.male_min,
+                                          male_max=args.male_max, accept_min_time=args.accept_min_time, max_time=end_time,
+                                          min_time=start_time, copies=args.copies, input_file=args.input_file,
+                                          threads=args.threads, output_file=cut_file_name, gap_times=None)
+            cut_video_wrap(cut_args)
         print(f"剪辑已完成：{cut_file_name}")
 
-        swap_args = argparse.Namespace(nput_file=cut_file_name, threads=args.threads, output_file=cut_file_name,
-                                       source_imgs=args.source_imgs, log_level='INFO', gender='female', sleep_time=0.01,
-                                       max_cache_frames=500)
-        main(swap_args)
+        if os.path.exists(out_file_name):
+            swap_args = argparse.Namespace(nput_file=cut_file_name, threads=args.threads, output_file=cut_file_name,
+                                           source_imgs=args.source_imgs, log_level='INFO', gender='female', sleep_time=0.01,
+                                           max_cache_frames=500)
+            main(swap_args)
+
         print(f"换脸完成，输出路径：{out_file_name}")
         start_time += args.item_time
         end_time += args.item_time
+        if start_time >= args.max_time:
+            break
+        if end_time >= args.max_time:
+            end_time = args.max_time
