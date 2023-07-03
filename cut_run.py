@@ -22,7 +22,7 @@ if __name__ == '__main__':
     parser.add_argument('-d', '--male_max', type=int, help='male_max', default=10)
     parser.add_argument('-amt', '--accept_min_time', type=float, help='accept_min_time', default=2)
     parser.add_argument('-maxt', '--max_time', type=float, help='max_time', default=None)
-    parser.add_argument('-mint', '--min_time', type=float, help='min_time', default=None)
+    parser.add_argument('-mint', '--min_time', type=float, help='min_time', default=0)
     parser.add_argument('-cp', '--copies', type=int, help='copies', default=1)
 
     parser.add_argument('-it', '--item_time', type=int, help='split_time', default=1200)
@@ -30,11 +30,11 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     source_clip = VideoFileClip(args.input_file)
-    start_time = args.min_time
-    end_time = args.item_time
     if not args.max_time:
         args.max_time = source_clip.duration
 
+    start_time = args.min_time
+    end_time = args.item_time
     name, ext = os.path.splitext(args.input_file)
     face_file_identify = ""
     for face_file in args.source_imgs:
