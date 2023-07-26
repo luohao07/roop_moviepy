@@ -1,6 +1,7 @@
 import argparse
 import os.path
 
+from moviepy.video.compositing.concatenate import concatenate_videoclips
 from moviepy.video.io.VideoFileClip import VideoFileClip
 
 from src.auto_cut import cut_video_wrap
@@ -42,6 +43,7 @@ if __name__ == '__main__':
         face_file_identify += "_" + face_file_name
     index = 0
 
+    output_files = []
     while True:
         cut_file_name = f"{name}_{index}{ext}"
         out_file_name = f"{name}_{index}{face_file_identify}{ext}"
@@ -69,3 +71,10 @@ if __name__ == '__main__':
         if end_time >= args.max_time:
             end_time = args.max_time
         index += 1
+        output_files.append(out_file_name)
+
+    merge_reface_file = f"{name}_{face_file_identify}_merge{ext}"
+    if not os.path.exists(merge_reface_file):
+        print(f'开始合成换脸后的视频，保存路径f{merge_reface_file}')
+        merge_reface_clip = concatenate_videoclips(merge_reface_file)
+        merge_reface_clip.write_videofile(merge_reface_file, threads=args.threads, audio_codec='aac')
