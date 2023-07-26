@@ -134,16 +134,16 @@ def cut_video_wrap(args):
         progress = tqdm(
             total=count_nones(accept_infos, int(args.min_time * clips[0].fps), int(args.max_time * clips[0].fps)) /
                   clips[0].fps / gap_time)
-        print(f"开始第{index}轮剪辑gap_time={gap_time}，当前待检测帧{accept_infos.count(None)}，",
+        print(f"开始第{index + 1}轮剪辑gap_time={gap_time}，当前待检测帧{accept_infos.count(None)}，",
               f"已过滤帧{accept_infos.count(False)}, 已接受帧{accept_infos.count(True)}")
         args.gap_time = gap_time
         with concurrent.futures.ThreadPoolExecutor(max_workers=len(clips)) as executor:
             for task_i in range(len(clips)):
                 start_time = (args.max_time - args.min_time) / len(clips) * task_i + args.min_time
                 end_time = (args.max_time - args.min_time) / len(clips) * (task_i + 1) + args.min_time
-                print(f"提交第{index}轮第{task_i + 1}个任务，start_time={start_time}, end_time = {end_time}")
+                print(f"提交第{index + 1}轮第{task_i + 1}个任务，start_time={start_time}, end_time = {end_time}")
                 executor.submit(cut_video, clips[task_i], accept_infos, args, start_time, end_time, progress)
-        print(f"第{index}轮执行完成")
+        print(f"第{index + 1}轮执行完成")
         # 如果任意两个时间差小于accept_min_time的帧都为False，那中间的部分就不用检测了，直接设置为False
         set_false_between(accept_infos, args.accept_min_time * clips[0].fps)
 
@@ -154,6 +154,9 @@ def cut_video_wrap(args):
     cut_times = cut_frames
     try:
         new_clip = do_cut_to_clip(clips[0], args, cut_times)
+        if new_clip == False:
+            print('跳过合成')
+            return
         new_clip.write_videofile(args.output_file, threads=args.threads * args.copies, audio_codec='aac')
     except:
         print(f"剪辑已完成，但合成失败！文件占用，现场已保存，可使用以下命令重试合成操作: ",
@@ -215,6 +218,7 @@ def do_cut_to_clip(clip, args, cut_times, save_log=True):
         except:
             print(f"提取片段时出现异常，片段:[{s}, {e}],")
             continue
-
+    if sum_time == 0:
+        return False
     print(f"原时间:{clip.duration}，剪辑后的时长:{sum_time}")
     return concatenate_videoclips(sub_clips)
