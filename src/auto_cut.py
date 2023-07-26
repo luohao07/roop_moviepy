@@ -107,7 +107,7 @@ def set_false_out_times(accept_infos, clip, args):
 def count_nones(li, start_index, end_index):
     index = start_index
     count = 0
-    while index <= end_index:
+    while index < end_index:
         if li[index] is None:
             count += 1
         index += 1
