@@ -76,5 +76,5 @@ if __name__ == '__main__':
     merge_reface_file = f"{name}_{face_file_identify}_merge{ext}"
     if not os.path.exists(merge_reface_file):
         print(f'开始合成换脸后的视频，保存路径f{merge_reface_file}')
-        merge_reface_clip = concatenate_videoclips(merge_reface_file)
+        merge_reface_clip = concatenate_videoclips([VideoFileClip(file) for file in output_files])
         merge_reface_clip.write_videofile(merge_reface_file, threads=args.threads, audio_codec='aac')
