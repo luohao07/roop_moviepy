@@ -128,7 +128,8 @@ def get_processed_frame(processed_frames, index):
 
 
 def main(args):
-    assert os.path.exists(args.input_file)
+    if not os.path.exists(args.input_file) :
+        return
     globals.args = args
     globals.args.log_level = args.log_level
     for source_img in args.source_imgs:

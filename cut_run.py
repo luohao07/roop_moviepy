@@ -73,7 +73,7 @@ if __name__ == '__main__':
         index += 1
         output_files.append(out_file_name)
 
-    merge_reface_file = f"{name}_{face_file_identify}_merge{ext}"
+    merge_reface_file = f"{name}{face_file_identify}_merge{ext}"
     if not os.path.exists(merge_reface_file):
         print(f'开始合成换脸后的视频，保存路径f{merge_reface_file}')
         merge_reface_clip = concatenate_videoclips([VideoFileClip(file) for file in output_files])
