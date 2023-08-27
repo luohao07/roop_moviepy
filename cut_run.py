@@ -74,6 +74,7 @@ if __name__ == '__main__':
         index += 1
         output_files.append(out_file_name)
 
+    output_files = [file for file in output_files if os.path.exists(file)]
     merge_reface_file = f"{name}{face_file_identify}_merge{ext}"
     if not os.path.exists(merge_reface_file):
         print(f'开始合成换脸后的视频，保存路径f{merge_reface_file}')
