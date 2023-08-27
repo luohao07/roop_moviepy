@@ -16,5 +16,6 @@ if __name__ == '__main__':
     parser.add_argument('-maxt', '--max_time', type=float, help='max_time', default=None)
     parser.add_argument('-mint', '--min_time', type=float, help='min_time', default=None)
     parser.add_argument('-cp', '--copies', type=int, help='copies', default=1)
+    parser.add_argument('-ms', '--min_score', type=float, help='min accept det score', default=0.6)
     args = parser.parse_args()
     cut_video_wrap(args)

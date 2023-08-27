@@ -41,6 +41,7 @@ def get_index_range(arr, accept_min_size):
 
 def is_accept(frame, index, accept_infos, progress, args):
     many_faces = get_face_many(frame)
+    many_faces = [face for face in many_faces if face['det_score'] >= args.min_score]
     male_faces = [face for face in many_faces if face['gender'] == 1]
     female_faces = [face for face in many_faces if face['gender'] == 0]
     accept = args.female_min <= len(female_faces) <= args.female_max and args.male_min <= len(

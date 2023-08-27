@@ -15,7 +15,8 @@ if __name__ == '__main__':
     parser.add_argument('-l', '--log_level', type=str, help='log level', default="INFO")
     parser.add_argument('-g', '--gender', type=str, help='gender: male or female', default='female')
     parser.add_argument('-st', '--sleep_time', type=float, help='sleep time on wait', default=0.01)
-    parser.add_argument('-mcf', '--max_cache_frames', type=float, help='sleep time on wait', default=500)
+    parser.add_argument('-mcf', '--max_cache_frames', type=float, help='max cache frames', default=500)
+    parser.add_argument('-ms', '--min_score', type=float, help='min accept det score', default=0.6)
 
     parser.add_argument('-a', '--female_min', type=int, help='female_min', default=1)
     parser.add_argument('-b', '--female_max', type=int, help='female_max', default=10)
@@ -52,7 +53,7 @@ if __name__ == '__main__':
         if not os.path.exists(cut_file_name):
             cut_args = argparse.Namespace(female_min=args.female_min, female_max=args.female_max, male_min=args.male_min,
                                           male_max=args.male_max, accept_min_time=args.accept_min_time, max_time=end_time,
-                                          min_time=start_time, copies=args.copies, input_file=args.input_file,
+                                          min_time=start_time, copies=args.copies, input_file=args.input_file, min_score=args.min_score,
                                           threads=args.threads, output_file=cut_file_name, gap_times=None)
             cut_video_wrap(cut_args)
         print(f"剪辑已完成：{cut_file_name}")
@@ -60,7 +61,7 @@ if __name__ == '__main__':
         if not os.path.exists(out_file_name):
             swap_args = argparse.Namespace(input_file=cut_file_name, threads=args.threads, output_file=out_file_name,
                                            source_imgs=args.source_imgs, log_level='INFO', gender='female', sleep_time=0.01,
-                                           max_cache_frames=500)
+                                           min_score=args.min_score, max_cache_frames=500)
             main(swap_args)
 
         print(f"换脸完成，输出路径：{out_file_name}")

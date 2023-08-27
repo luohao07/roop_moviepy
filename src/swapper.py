@@ -44,6 +44,7 @@ def swap_face_in_frame(source_face, target_face, frame):
 def process_faces(source_faces, target_frame):
     many_faces = get_face_many(target_frame)
     many_faces = sorted(many_faces, key=lambda x: x['bbox'][0])
+    many_faces = [face for face in many_faces if face['det_score'] >= globals.args.min_score]
     if globals.args.gender == 'male':
         many_faces = [face for face in many_faces if face['gender'] == 1]
     if globals.args.gender == 'female':
